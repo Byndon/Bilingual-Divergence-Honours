@@ -1,0 +1,2267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>Centroids_v2.kml</name>
+	<open>1</open>
+	<Style id="sn_blue-pushpin0">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin7">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin23">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin112">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin121</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin34</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_grn-pushpin124">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_blue-pushpin02">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin26</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin27</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_grn-pushpin472">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_grn-pushpin020</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_grn-pushpin57</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_blue-pushpin10">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin221">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_blue-pushpin140">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin43</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin002</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ltblu-pushpin41">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin172</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin310</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ylw-pushpin1615">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin340">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_grn-pushpin126">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_grn-pushpin87</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_grn-pushpin513</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_blue-pushpin35">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin61</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin36</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ylw-pushpin1115">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_grn-pushpin43">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin52">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin15">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_grn-pushpin162">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ylw-pushpin812">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin500</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin90</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_blue-pushpin4">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_grn-pushpin333">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin25">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_grn-pushpin0010">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_blue-pushpin30">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin15</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin00</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_ltblu-pushpin60">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin61">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ylw-pushpin111">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin02">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_grn-pushpin459">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_blue-pushpin28">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ylw-pushpin00">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin19">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin15">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_wht-pushpin80">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_wht-pushpin340</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_wht-pushpin70</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_grn-pushpin401">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin36">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_wht-pushpin340">
+		<IconStyle>
+			<color>ff66ccff</color>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin43">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin21">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_grn-pushpin57">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin1130">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin28">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin200">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin70</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin02</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_grn-pushpin4217">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin2">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin11">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin03">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin60</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin62</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ltblu-pushpin113">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ylw-pushpin12">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin111</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin99</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ylw-pushpin134">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin63</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin12</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ylw-pushpin33">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin321</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin642</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ltblu-pushpin113">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin23</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin38</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ltblu-pushpin220">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin340</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin230</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ltblu-pushpin27">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin1130</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin250</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ltblu-pushpin90">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin121">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_grn-pushpin4214">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_blue-pushpin27">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin02">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ylw-pushpin99">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_grn-pushpin461">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_grn-pushpin401</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_grn-pushpin333</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ltblu-pushpin710">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin02</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin122</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_ltblu-pushpin03">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_blue-pushpin11">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_grn-pushpin4513">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_blue-pushpin">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin21</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin26</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_grn-pushpin362">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_grn-pushpin124</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_grn-pushpin43</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_blue-pushpin14">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin7</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin2</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_ylw-pushpin21">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_grn-pushpin002">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_grn-pushpin162</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_grn-pushpin213</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_blue-pushpin002">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin26">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin8">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin81">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin6">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin03</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin113</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ylw-pushpin06">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin4550</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin2503</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_wht-pushpin70">
+		<IconStyle>
+			<color>ff66ccff</color>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_blue-pushpin5">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin62">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin310">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin00">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_blue-pushpin">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin250">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin172">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ltblu-pushpin71">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ylw-pushpin912">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin011</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin1115</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_grn-pushpin222">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_grn-pushpin4217</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_grn-pushpin4513</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_ltblu-pushpin410">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ylw-pushpin63">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin410">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin410</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin36</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ylw-pushpin2503">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin34">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin52</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin81</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ylw-pushpin49">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin381</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin00</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ltblu-pushpin16">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin15</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin00</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_ylw-pushpin140">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin102</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin80</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_ylw-pushpin102">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin280">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin71</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin26</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_blue-pushpin2">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_blue-pushpin22">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin19</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin5</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_blue-pushpin26">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_grn-pushpin214">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_grn-pushpin4214</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_grn-pushpin459</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ylw-pushpin80">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_blue-pushpin26">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_grn-pushpin213">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ylw-pushpin90">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ylw-pushpin500">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin122">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_blue-pushpin1">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin0</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin4</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_grn-pushpin80">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_grn-pushpin1210</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_grn-pushpin0010</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_ltblu-pushpin70">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_blue-pushpin3">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin1</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_grn-pushpin1210">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_grn-pushpin513">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ylw-pushpin195">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin21</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin1615</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sn_ylw-pushpin321">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_grn-pushpin87">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin38">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_blue-pushpin00">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ylw-pushpin4550">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_grn-pushpin020">
+		<IconStyle>
+			<color>ff800040</color>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_blue-pushpin27">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin25</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin28</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_blue-pushpin4">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin28</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin11</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ylw-pushpin642">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ylw-pushpin12">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ylw-pushpin011">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin110">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin221</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin90</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="msn_blue-pushpin5">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_blue-pushpin8</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_blue-pushpin10</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ltblu-pushpin230">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_ylw-pushpin381">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_ltblu-pushpin34">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ltblu-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sn_blue-pushpin1">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="sh_blue-pushpin36">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<StyleMap id="msn_ltblu-pushpin31">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ltblu-pushpin11</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ltblu-pushpin2</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Folder>
+		<name>Centroid Coordinates for Australian languages 1.1</name>
+		<open>1</open>
+		<description>Version 2.0, August 2011
+Justin Lo and Claire Bowern
+Creation of this map was funded by NSF grant 844550 &quot;Pama-Nyungan and Australian Prehistory&quot;.
+
+For Non-commercial use only; all moral rights to this work are asserted: to acknowledge use of the information, please quote
+
+Lo, J. and C. Bowern, 2009. Centroid Coordinates for Australian languages, Version 1.2; Database, Yale University, New Haven, CT.
+
+Comments and corrections welcome! proto.pama.nyungan@gmail.com
+
+Updates in 1.2:
+Corrected Pilbara locations as per Wangka Maya&apos;s published resources
+Added *rough* subgroup polygons (note, highly tentative, known to be wrong in some places, not reflective of CB&apos;s current views but useful as an underlay for cognate mapping).
+
+Updates in 2.0
+Numerous small updates; Better placement of Non-Pama-Nyungan languages; Some additions to Paman</description>
+		<LookAt>
+			<longitude>134.3821806799596</longitude>
+			<latitude>-24.29940763152673</latitude>
+			<altitude>0</altitude>
+			<heading>1.562786243033766</heading>
+			<tilt>0</tilt>
+			<range>4473181.089402387</range>
+			<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+		</LookAt>
+		<Folder>
+			<name>Pama-Nyungan Language Locations</name>
+			<open>1</open>
+			<description>Added information from VACL &quot;Aboriginal Languages of Victoria&quot;, August 2009
+Added information from Pilbara language map, Wangka Maya, August 2009</description>
+			<Folder>
+				<name>LowerMurray</name>
+				<open>1</open>
+				<Placemark>
+					<name>Keramin</name>
+					<description>placement uncertain</description>
+					<LookAt>
+						<longitude>141.8261502877571</longitude>
+						<latitude>-35.31501509898943</latitude>
+						<altitude>0</altitude>
+						<heading>-10.76604305533481</heading>
+						<tilt>0</tilt>
+						<range>511632.4669546842</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ylw-pushpin12</styleUrl>
+					<Point>
+						<coordinates>141.5848077513054,-34.06473329282601,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Ngarkat</name>
+					<Camera>
+						<longitude>139.9363187173754</longitude>
+						<latitude>-37.65577936664708</latitude>
+						<altitude>862390.8330880776</altitude>
+						<heading>19.02437846586191</heading>
+						<tilt>14.51730544925686</tilt>
+						<roll>2.545995230937974</roll>
+					</Camera>
+					<styleUrl>#msn_grn-pushpin214</styleUrl>
+					<Point>
+						<coordinates>140.3429233720771,-35.24606212287762,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Meru</name>
+					<LookAt>
+						<longitude>140.2643249310656</longitude>
+						<latitude>-34.3775180732723</latitude>
+						<altitude>0</altitude>
+						<heading>-6.786005725253421</heading>
+						<tilt>0.3803042820781523</tilt>
+						<range>584794.0010917819</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin214</styleUrl>
+					<Point>
+						<coordinates>140.3222081132378,-34.27543006213308,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Dadi Dadi</name>
+					<LookAt>
+						<longitude>145.3852416420866</longitude>
+						<latitude>-36.79503148201182</latitude>
+						<altitude>0</altitude>
+						<heading>-4.953844725180474</heading>
+						<tilt>0</tilt>
+						<range>1116479.606285419</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin472</styleUrl>
+					<Point>
+						<coordinates>143.0714844133618,-34.6293967631329,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Yitha Yitha</name>
+					<LookAt>
+						<longitude>141.5854211046575</longitude>
+						<latitude>-33.94708739900517</latitude>
+						<altitude>0</altitude>
+						<heading>1.161906257990421</heading>
+						<tilt>0</tilt>
+						<range>1107984.009960607</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin214</styleUrl>
+					<Point>
+						<coordinates>144.3262988687184,-33.52954802675198,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Kureinji</name>
+					<LookAt>
+						<longitude>142.5273581652915</longitude>
+						<latitude>-34.22348985824536</latitude>
+						<altitude>0</altitude>
+						<heading>-0.04301040981267922</heading>
+						<tilt>0</tilt>
+						<range>207594.6804340463</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin214</styleUrl>
+					<Point>
+						<coordinates>142.3137694444445,-34.1879554929458,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Peramangk</name>
+					<LookAt>
+						<longitude>140.7262962714083</longitude>
+						<latitude>-35.3520144095712</latitude>
+						<altitude>0</altitude>
+						<heading>1.770802688147012</heading>
+						<tilt>0.003660163370090144</tilt>
+						<range>908614.202305937</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin126</styleUrl>
+					<Point>
+						<coordinates>138.8964592193108,-34.85604553787832,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Ngarrindjeri</name>
+					<LookAt>
+						<longitude>140.3097003451229</longitude>
+						<latitude>-35.94444510819279</latitude>
+						<altitude>0</altitude>
+						<heading>-4.859533128734671</heading>
+						<tilt>0</tilt>
+						<range>260845.7057357616</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin214</styleUrl>
+					<Point>
+						<coordinates>139.818564547235,-35.94962693649524,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Bindjali</name>
+					<LookAt>
+						<longitude>145.3852416420866</longitude>
+						<latitude>-36.79503148201182</latitude>
+						<altitude>0</altitude>
+						<heading>-4.953844725180474</heading>
+						<tilt>0</tilt>
+						<range>1116479.606285419</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin80</styleUrl>
+					<Point>
+						<coordinates>140.6994941115941,-36.20018582310437,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Yaraldi</name>
+					<LookAt>
+						<longitude>140.7262962714083</longitude>
+						<latitude>-35.3520144095712</latitude>
+						<altitude>0</altitude>
+						<heading>1.770802688147012</heading>
+						<tilt>0.003660163370090144</tilt>
+						<range>908614.202305937</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin461</styleUrl>
+					<Point>
+						<coordinates>139.2054326885697,-35.57559949747515,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Ngayawang</name>
+					<LookAt>
+						<longitude>141.8261502877571</longitude>
+						<latitude>-35.31501509898943</latitude>
+						<altitude>0</altitude>
+						<heading>-10.76604305533481</heading>
+						<tilt>0</tilt>
+						<range>511632.4669546842</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin362</styleUrl>
+					<Point>
+						<coordinates>139.6011689002479,-34.7753439059205,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Raminyeri</name>
+					<LookAt>
+						<longitude>140.7262962714083</longitude>
+						<latitude>-35.3520144095712</latitude>
+						<altitude>0</altitude>
+						<heading>1.770802688147012</heading>
+						<tilt>0.003660163370090144</tilt>
+						<range>908614.202305937</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin002</styleUrl>
+					<Point>
+						<coordinates>138.2567003283421,-35.53663149215257,0</coordinates>
+					</Point>
+				</Placemark>
+			</Folder>
+			<Folder>
+				<name>Victoria-OTHER</name>
+				<open>1</open>
+				<Placemark>
+					<name>Waveroo</name>
+					<description>Waywurru</description>
+					<LookAt>
+						<longitude>146.3249350053622</longitude>
+						<latitude>-36.35371525371015</latitude>
+						<altitude>0</altitude>
+						<heading>2.549163860068059e-06</heading>
+						<tilt>0</tilt>
+						<range>125064.9584821381</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin222</styleUrl>
+					<Point>
+						<coordinates>146.5371248138646,-36.36307108040102,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Bungandidj</name>
+					<LookAt>
+						<longitude>141.8619674987468</longitude>
+						<latitude>-37.04863418514039</latitude>
+						<altitude>0</altitude>
+						<heading>-10.80027277116663</heading>
+						<tilt>0</tilt>
+						<range>511539.3812568645</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin31</styleUrl>
+					<Point>
+						<coordinates>140.3224132329716,-36.89138210498734,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Gunditjmara</name>
+					<Camera>
+						<longitude>142.0771791562355</longitude>
+						<latitude>-38.16870496185733</latitude>
+						<altitude>163614.2631210064</altitude>
+						<heading>-4.171972812793153</heading>
+						<tilt>0.5066792205974489</tilt>
+						<roll>-3.805938470310869</roll>
+					</Camera>
+					<styleUrl>#msn_ltblu-pushpin03</styleUrl>
+					<Point>
+						<coordinates>142.0583316632591,-38.22064836643228,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Bidhawal</name>
+					<LookAt>
+						<longitude>145.3852416420866</longitude>
+						<latitude>-36.79503148201182</latitude>
+						<altitude>0</altitude>
+						<heading>-4.953844725180474</heading>
+						<tilt>0</tilt>
+						<range>1116479.606285419</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin200</styleUrl>
+					<Point>
+						<coordinates>149.2520459081004,-37.21645804865572,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Jaitmatang</name>
+					<Camera>
+						<longitude>147.6709563275237</longitude>
+						<latitude>-36.44320851886607</latitude>
+						<altitude>80656.99283721737</altitude>
+						<heading>-7.142170435440807</heading>
+						<tilt>1.802006933743538</tilt>
+						<roll>-2.050961966093527</roll>
+					</Camera>
+					<styleUrl>#msn_grn-pushpin222</styleUrl>
+					<Point>
+						<coordinates>147.6589937450724,-36.58163686740664,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Yorta Yorta</name>
+					<LookAt>
+						<longitude>144.1269141615993</longitude>
+						<latitude>-36.43021109777049</latitude>
+						<altitude>0</altitude>
+						<heading>-12.08548158883443</heading>
+						<tilt>0</tilt>
+						<range>511517.6894167558</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin6</styleUrl>
+					<Point>
+						<coordinates>145.4814029782762,-36.15523973222443,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Kurnai</name>
+					<LookAt>
+						<longitude>147.4832152851309</longitude>
+						<latitude>-37.86375065028607</latitude>
+						<altitude>0</altitude>
+						<heading>-9.694367496969852</heading>
+						<tilt>0</tilt>
+						<range>686575.907211906</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_grn-pushpin222</styleUrl>
+					<Point>
+						<coordinates>147.4776580366945,-37.68977640463356,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Thangguai</name>
+					<LookAt>
+						<longitude>146.1284450625969</longitude>
+						<latitude>-38.19122980562471</latitude>
+						<altitude>0</altitude>
+						<heading>-1.461374285411944</heading>
+						<tilt>0.003658549483485429</tilt>
+						<range>1031443.383452281</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin410</styleUrl>
+					<Point>
+						<coordinates>148.6806099410188,-37.6489457922556,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Muk-Thang</name>
+					<LookAt>
+						<longitude>146.1284450625969</longitude>
+						<latitude>-38.19122980562471</latitude>
+						<altitude>0</altitude>
+						<heading>-1.461374285411944</heading>
+						<tilt>0.003658549483485429</tilt>
+						<range>1031443.383452281</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin34</styleUrl>
+					<Point>
+						<coordinates>147.8838803345264,-37.62635581546213,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Nulit</name>
+					<LookAt>
+						<longitude>146.1284450625969</longitude>
+						<latitude>-38.19122980562471</latitude>
+						<altitude>0</altitude>
+						<heading>-1.461374285411944</heading>
+						<tilt>0.003658549483485429</tilt>
+						<range>1031443.383452281</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin220</styleUrl>
+					<Point>
+						<coordinates>146.7963187985881,-37.99133292990522,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Dhudhuroa</name>
+					<LookAt>
+						<longitude>146.1284450625969</longitude>
+						<latitude>-38.19122980562471</latitude>
+						<altitude>0</altitude>
+						<heading>-1.461374285411944</heading>
+						<tilt>0.003658549483485429</tilt>
+						<range>1031443.383452281</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin280</styleUrl>
+					<Point>
+						<coordinates>147.0450379409293,-36.95881441480039,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Yabula-Yabula</name>
+					<LookAt>
+						<longitude>145.8571265585308</longitude>
+						<latitude>-36.45336224221287</latitude>
+						<altitude>0</altitude>
+						<heading>-1.235374193306164</heading>
+						<tilt>0.003660214153538533</tilt>
+						<range>1031567.621719633</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin113</styleUrl>
+					<Point>
+						<coordinates>145.2320912804122,-35.76116311802772,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Pallanganmiddan</name>
+					<LookAt>
+						<longitude>146.5781016554813</longitude>
+						<latitude>-37.1243610700048</latitude>
+						<altitude>0</altitude>
+						<heading>-13.58817812090211</heading>
+						<tilt>0</tilt>
+						<range>511166.6587284689</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin41</styleUrl>
+					<Point>
+						<coordinates>146.4749268667461,-36.5453713707178,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Warrnambool</name>
+					<LookAt>
+						<longitude>141.1595230109423</longitude>
+						<latitude>-37.636043853789</latitude>
+						<altitude>0</altitude>
+						<heading>0.7721444397886683</heading>
+						<tilt>0</tilt>
+						<range>770582.7247978948</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin112</styleUrl>
+					<Point>
+						<coordinates>142.3896511438579,-38.35261802430615,0</coordinates>
+					</Point>
+				</Placemark>
+			</Folder>
+			<Folder>
+				<name>Yuin-Kuri</name>
+				<open>1</open>
+				<Folder>
+					<name>Yuin</name>
+					<open>1</open>
+					<Placemark>
+						<name>Thawa</name>
+						<LookAt>
+							<longitude>146.1284450625969</longitude>
+							<latitude>-38.19122980562471</latitude>
+							<altitude>0</altitude>
+							<heading>-1.461374285411944</heading>
+							<tilt>0.003658549483485429</tilt>
+							<range>1031443.383452281</range>
+							<altitudeMode>relativeToGround</altitudeMode>
+						</LookAt>
+						<styleUrl>#msn_ltblu-pushpin27</styleUrl>
+						<Point>
+							<coordinates>149.7169305983786,-37.06227181167917,0</coordinates>
+						</Point>
+					</Placemark>
+					<Placemark>
+						<name>Ngarigu</name>
+						<LookAt>
+							<longitude>147.3012822866736</longitude>
+							<latitude>-36.03400597212178</latitude>
+							<altitude>0</altitude>
+							<heading>-10.55365848604977</heading>
+							<tilt>22.85114242941097</tilt>
+							<range>510605.9336891043</range>
+							<altitudeMode>relativeToGround</altitudeMode>
+						</LookAt>
+						<styleUrl>#msn_wht-pushpin80</styleUrl>
+						<Point>
+							<coordinates>148.7238073479325,-36.30008261002627,0</coordinates>
+						</Point>
+					</Placemark>
+				</Folder>
+			</Folder>
+			<Folder>
+				<name>Kulin</name>
+				<open>1</open>
+				<Placemark>
+					<name>Buwandik</name>
+					<LookAt>
+						<longitude>141.8619674987468</longitude>
+						<latitude>-37.04863418514039</latitude>
+						<altitude>0</altitude>
+						<heading>-10.80027277116663</heading>
+						<tilt>0</tilt>
+						<range>511539.3812568645</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin30</styleUrl>
+					<Point>
+						<coordinates>140.3576002373075,-37.05117668517125,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Ngurraiillam</name>
+					<Camera>
+						<longitude>145.745242685487</longitude>
+						<latitude>-36.69489020663578</latitude>
+						<altitude>108009.451344363</altitude>
+						<heading>-6.954521673025981</heading>
+						<tilt>3.041612971593835</tilt>
+						<roll>-1.335972261585694</roll>
+					</Camera>
+					<styleUrl>#msn_ylw-pushpin912</styleUrl>
+					<Point>
+						<coordinates>145.3980773349281,-36.38266354563612,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Wergaia</name>
+					<LookAt>
+						<longitude>141.9470141093254</longitude>
+						<latitude>-35.40388458143134</latitude>
+						<altitude>0</altitude>
+						<heading>-12.40718814479515</heading>
+						<tilt>0</tilt>
+						<range>420998.3426028597</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin27</styleUrl>
+					<Point>
+						<coordinates>142.2582131518947,-35.97245775095991,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Djargurdwurung</name>
+					<Camera>
+						<longitude>142.3880464484447</longitude>
+						<latitude>-38.34020211521755</latitude>
+						<altitude>265486.3126531957</altitude>
+						<heading>-4.364095974211011</heading>
+						<tilt>0.4989040183664859</tilt>
+						<roll>-3.608896084754088</roll>
+					</Camera>
+					<styleUrl>#msn_ylw-pushpin912</styleUrl>
+					<Point>
+						<coordinates>143.2481379189315,-38.21164849201645,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Wathawurrung</name>
+					<LookAt>
+						<longitude>144.1455139499963</longitude>
+						<latitude>-37.38130838818195</latitude>
+						<altitude>0</altitude>
+						<heading>-12.09463687403278</heading>
+						<tilt>0</tilt>
+						<range>511171.6146747295</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin35</styleUrl>
+					<Point>
+						<coordinates>144.0718193582527,-37.97031225554175,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Woiwurrung</name>
+					<LookAt>
+						<longitude>144.1455139499963</longitude>
+						<latitude>-37.38130838818195</latitude>
+						<altitude>0</altitude>
+						<heading>-12.09463687403278</heading>
+						<tilt>0</tilt>
+						<range>511171.6146747295</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin14</styleUrl>
+					<Point>
+						<coordinates>145.00879193743,-37.63361606142963,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Ladji Ladji</name>
+					<LookAt>
+						<longitude>141.8261502877571</longitude>
+						<latitude>-35.31501509898943</latitude>
+						<altitude>0</altitude>
+						<heading>-10.76604305533481</heading>
+						<tilt>0</tilt>
+						<range>511632.4669546842</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin22</styleUrl>
+					<Point>
+						<coordinates>141.1851163563694,-34.90019749069575,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Djabwurung</name>
+					<LookAt>
+						<longitude>142.9105910163052</longitude>
+						<latitude>-37.30349409744511</latitude>
+						<altitude>0</altitude>
+						<heading>0.610629555737834</heading>
+						<tilt>0</tilt>
+						<range>35326.42640123484</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ylw-pushpin912</styleUrl>
+					<Point>
+						<coordinates>142.8773284496534,-37.29896099145907,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Jardwadjali</name>
+					<LookAt>
+						<longitude>142.1929356896889</longitude>
+						<latitude>-37.02597456201466</latitude>
+						<altitude>0</altitude>
+						<heading>1.325619151730473</heading>
+						<tilt>0</tilt>
+						<range>463740.6740850278</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ylw-pushpin912</styleUrl>
+					<Point>
+						<coordinates>142.1625999440899,-36.76392115139881,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Baraba Baraba</name>
+					<LookAt>
+						<longitude>145.0417395517823</longitude>
+						<latitude>-34.24411950288371</latitude>
+						<altitude>0</altitude>
+						<heading>-0.04984108926724233</heading>
+						<tilt>0</tilt>
+						<range>599647.1691555597</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin3</styleUrl>
+					<Point>
+						<coordinates>144.3137098951474,-35.27305748772266,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Djadjawurung</name>
+					<LookAt>
+						<longitude>145.1216735139895</longitude>
+						<latitude>-37.47493328652349</latitude>
+						<altitude>0</altitude>
+						<heading>0.2921998478271534</heading>
+						<tilt>0</tilt>
+						<range>551526.4182164479</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin02</styleUrl>
+					<Point>
+						<coordinates>143.7747733142164,-36.78794170978385,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Nari Nari</name>
+					<LookAt>
+						<longitude>144.1175836329323</longitude>
+						<latitude>-34.04401712170614</latitude>
+						<altitude>0</altitude>
+						<heading>0.9505757134579959</heading>
+						<tilt>0</tilt>
+						<range>655304.7941702034</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ylw-pushpin912</styleUrl>
+					<Point>
+						<coordinates>144.3450717587053,-34.53088208998563,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Boonwurrung</name>
+					<LookAt>
+						<longitude>145.4628959826769</longitude>
+						<latitude>-38.00300945487519</latitude>
+						<altitude>0</altitude>
+						<heading>-8.425489102188205</heading>
+						<tilt>0</tilt>
+						<range>686352.0190835835</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ylw-pushpin912</styleUrl>
+					<Point>
+						<coordinates>145.8369925934341,-38.44632222768823,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Madhi Madhi</name>
+					<LookAt>
+						<longitude>143.6933662528776</longitude>
+						<latitude>-34.23644618242626</latitude>
+						<altitude>0</altitude>
+						<heading>0.8730141825013978</heading>
+						<tilt>0</tilt>
+						<range>183026.8961050214</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ylw-pushpin912</styleUrl>
+					<Point>
+						<coordinates>143.669439739476,-34.13829931743091,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Daungwurrung</name>
+					<LookAt>
+						<longitude>144.2954158253999</longitude>
+						<latitude>-37.114231149597</latitude>
+						<altitude>0</altitude>
+						<heading>-4.062282299497726</heading>
+						<tilt>0</tilt>
+						<range>652430.7769586829</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin</styleUrl>
+					<Point>
+						<coordinates>144.9985420250028,-37.00369674023433,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Gulidjan</name>
+					<Camera>
+						<longitude>145.3852416420866</longitude>
+						<latitude>-36.79503148201182</latitude>
+						<altitude>1116479.606285418</altitude>
+						<heading>-4.953844725180474</heading>
+						<tilt>0</tilt>
+						<roll>0</roll>
+					</Camera>
+					<styleUrl>#msn_blue-pushpin140</styleUrl>
+					<Point>
+						<coordinates>143.5799789708422,-38.10428439302565,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Wadi Wadi</name>
+					<LookAt>
+						<longitude>143.8237722692361</longitude>
+						<latitude>-35.50282628338347</latitude>
+						<altitude>0</altitude>
+						<heading>-11.91627341814687</heading>
+						<tilt>0</tilt>
+						<range>511680.4553637992</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin5</styleUrl>
+					<Point>
+						<coordinates>142.9096293654808,-35.25507785210993,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Gadubanud</name>
+					<LookAt>
+						<longitude>143.8481824131213</longitude>
+						<latitude>-38.13194110019172</latitude>
+						<altitude>0</altitude>
+						<heading>-9.634251505985516</heading>
+						<tilt>22.85205432792873</tilt>
+						<range>287071.3985019003</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ylw-pushpin912</styleUrl>
+					<Point>
+						<coordinates>143.774757345766,-38.60687307477696,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Keeraywurrung</name>
+					<LookAt>
+						<longitude>143.0220858187101</longitude>
+						<latitude>-37.80031100798611</latitude>
+						<altitude>0</altitude>
+						<heading>-0.009251937277907683</heading>
+						<tilt>0</tilt>
+						<range>172044.7496073773</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin1</styleUrl>
+					<Point>
+						<coordinates>142.8706075295545,-38.11573249740429,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Wemba Wemba</name>
+					<LookAt>
+						<longitude>143.8237722692361</longitude>
+						<latitude>-35.50282628338347</latitude>
+						<altitude>0</altitude>
+						<heading>-11.91627341814687</heading>
+						<tilt>0</tilt>
+						<range>511680.4553637992</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_blue-pushpin4</styleUrl>
+					<Point>
+						<coordinates>143.2910156343284,-35.59779558113884,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Yari-Yari</name>
+					<LookAt>
+						<longitude>145.3852416420866</longitude>
+						<latitude>-36.79503148201182</latitude>
+						<altitude>0</altitude>
+						<heading>-4.953844725180474</heading>
+						<tilt>0</tilt>
+						<range>1116479.606285419</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin710</styleUrl>
+					<Point>
+						<coordinates>141.658438406776,-34.68251946690335,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>YuYu</name>
+					<description>also called Ngindadj</description>
+					<LookAt>
+						<longitude>141.8261502877571</longitude>
+						<latitude>-35.31501509898943</latitude>
+						<altitude>0</altitude>
+						<heading>-10.76604305533481</heading>
+						<tilt>0</tilt>
+						<range>511632.4669546842</range>
+						<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin16</styleUrl>
+					<Point>
+						<coordinates>139.7649989534004,-34.02335850202446,0</coordinates>
+					</Point>
+				</Placemark>
+				<Placemark>
+					<name>Wotjobaluk</name>
+					<LookAt>
+						<longitude>145.8571265585308</longitude>
+						<latitude>-36.45336224221287</latitude>
+						<altitude>0</altitude>
+						<heading>-1.235374193306164</heading>
+						<tilt>0.003660214153538533</tilt>
+						<range>1031567.621719633</range>
+						<altitudeMode>relativeToGround</altitudeMode>
+					</LookAt>
+					<styleUrl>#msn_ltblu-pushpin110</styleUrl>
+					<Point>
+						<coordinates>141.4179142153685,-35.82104542032,0</coordinates>
+					</Point>
+				</Placemark>
+			</Folder>
+			<Placemark>
+				<name>Piangil</name>
+				<LookAt>
+					<longitude>143.8237722692361</longitude>
+					<latitude>-35.50282628338347</latitude>
+					<altitude>0</altitude>
+					<heading>-11.91627341814687</heading>
+					<tilt>0</tilt>
+					<range>511680.4553637992</range>
+					<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+				</LookAt>
+				<styleUrl>#msn_ylw-pushpin140</styleUrl>
+				<Point>
+					<coordinates>143.1569468647695,-34.94970322789231,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>Colac</name>
+				<LookAt>
+					<longitude>142.9470025542971</longitude>
+					<latitude>-37.51935909193565</latitude>
+					<altitude>0</altitude>
+					<heading>-3.536018501825954</heading>
+					<tilt>0</tilt>
+					<range>408256.646573198</range>
+					<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+				</LookAt>
+				<styleUrl>#msn_ylw-pushpin812</styleUrl>
+				<Point>
+					<coordinates>143.422444,-38.471266,0</coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+		<Folder>
+			<name>SubgroupCentroids</name>
+			<open>1</open>
+			<Placemark>
+				<name>Lower Murray</name>
+				<LookAt>
+					<longitude>145.6141454300403</longitude>
+					<latitude>-33.73283433734878</latitude>
+					<altitude>0</altitude>
+					<heading>-1.835669571028461</heading>
+					<tilt>0</tilt>
+					<range>2150052.06283096</range>
+					<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+				</LookAt>
+				<styleUrl>#msn_ylw-pushpin134</styleUrl>
+				<Point>
+					<coordinates>139.966888265753,-35.36476951354091,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>Kulin</name>
+				<LookAt>
+					<longitude>145.6141454300403</longitude>
+					<latitude>-33.73283433734878</latitude>
+					<altitude>0</altitude>
+					<heading>-1.835669571028461</heading>
+					<tilt>0</tilt>
+					<range>2150052.06283096</range>
+					<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+				</LookAt>
+				<styleUrl>#msn_ylw-pushpin195</styleUrl>
+				<Point>
+					<coordinates>143.4140517426105,-35.93551531109423,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>Bunganditj</name>
+				<LookAt>
+					<longitude>145.6141454300403</longitude>
+					<latitude>-33.73283433734878</latitude>
+					<altitude>0</altitude>
+					<heading>-1.835669571027827</heading>
+					<tilt>0</tilt>
+					<range>1416304.619776811</range>
+					<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+				</LookAt>
+				<styleUrl>#msn_ylw-pushpin06</styleUrl>
+				<Point>
+					<coordinates>141.0806068957606,-37.50087428302589,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>Gippsland</name>
+				<LookAt>
+					<longitude>145.6141454300403</longitude>
+					<latitude>-33.73283433734878</latitude>
+					<altitude>0</altitude>
+					<heading>-1.835669571027827</heading>
+					<tilt>0</tilt>
+					<range>1416304.619776811</range>
+					<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+				</LookAt>
+				<styleUrl>#msn_ylw-pushpin33</styleUrl>
+				<Point>
+					<coordinates>146.9664974840944,-37.40317837832602,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>Yorta-Yorta</name>
+				<LookAt>
+					<longitude>145.6141454300403</longitude>
+					<latitude>-33.73283433734878</latitude>
+					<altitude>0</altitude>
+					<heading>-1.835669571027827</heading>
+					<tilt>0</tilt>
+					<range>1416304.619776811</range>
+					<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+				</LookAt>
+				<styleUrl>#msn_ylw-pushpin49</styleUrl>
+				<Point>
+					<coordinates>145.2535812752847,-35.35723802656781,0</coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+	</Folder>
+</Document>
+</kml>
