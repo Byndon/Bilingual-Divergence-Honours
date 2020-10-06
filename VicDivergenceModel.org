@@ -1,0 +1,35 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
+#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
+#+options: timestamp:t title:t toc:t todo:t |:t
+#+title: VicDivergenceModel
+#+date: <2020-09-13 Sun>
+#+author: Callan Bindon
+#+email: 22242833@student.uwa.edu.au
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 26.3 (Org mode 9.3.6)
+
+
+* Project Goals and Overview
+#+begin_quote
+/What types of multilingual speaker interaction can help to explain the synchronic patterns of lexical difference in Victorian Aboriginal Languages?/
+#+end_quote
+
+In this study, I will be producing various models of lexical change in an attempt to find a model which has the best fit for the synchronic lexical patterns observed in Victorian Aboriginal languages. The model will include a variety of parameters, including the possible effects of the  \textsc{anti-doppel bias}, a production bias against word forms common to a bilingual's languages, which has not been previously considered. 
+
+This research question is based on Historical linguistic principles of applying known synchronic processes over time in an attempt to find out about the linguistic past of languages and their communities of speakers.
+
+
+#+NAME:
+#+begin_src python :results output 
+  import time
+  print("Hello, today's date is %s" % time.ctime())
+  print('Two plus two is four')
+#+end_src
+
+#+RESULTS: 
+: Hello, today's date is Tue Sep 29 19:09:11 2020
+: Two plus two is four
