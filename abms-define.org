@@ -1,31 +1,40 @@
-Sub-Agents (the populations in each language group) [Object]
-	Monitoring level 0-1: based on how many speakers share thier repertoire. More shared = lower monitoring
+* Sub-Agents (the populations in each language group) [Object]
+	- Monitoring level 0-1: based on how many speakers share thier repertoire. More shared = lower monitoring
 		Either calculated in the model OR defined as a [MODEL PARAMETER]
-	Language Mode 0-1 [How is language mode represented with >1 language. Do I need hgher dimensions?]
+	- Language Mode 0-1 [How is language mode represented with >1 language. Do I need higher dimensions? Yes, see black notebook]
 		https://www.francoisgrosjean.ch/bilin_bicult/10%20Grosjean.pdf [1]
-	List of languages: Random permutation of connected languages AND group affiliated language.
+
+                #+begin_src dot :file mode.png :exports none :results silent
+                  graph{
+                  L1 -- l2;
+                  L1 -- l3;
+                  L1 -- l4;
+                  L1 -- l5;
+                  }
+                #+end_src
+[[file:mode.png]]
+	- List of languages: Random permutation of connected languages AND group affiliated language [can also be dictated as a MODEL PARAMETER]
 	Calculation of word form biases (Ellison & Miceli, 2017)
 	
-	Pandas dataframe:
+** Pandas dataframe:
 	| UID | MONITORING LEVEL | MODE                  | LANG LIST |
-	+-----+------------------+-----------------------+-----------+
-	| int | double			 | multidimenisonal list | [,]       |
+	| int | double           | multidimenisonal list | [,]       |
 	
 	Things to consider:
 		Calculating language mode.
 		Calculating Monitoring level.
 		How likely is it to learn subsequent languages [MODEL PARAMETER]
-		
-Language Forms (The forms used in each language as they change over time.) [Object]
+
+* Language Forms (The forms used in each language as they change over time.) [Object]
 	This implies that a group can only directly affect its affiliated language.
 	Any group's usage of thier affiliated language will directly affect how Sub-Agents/individuals in other groups use that language. This is a forseen side-effect. 
 		If this isn't the case, the model needs greater complexity. And it would mean that language groups would cause divergence for all thier languages.
-	Pandas Dataframe:
-	| Meaning | list of forms 		  |
-	+---------+-----------------------+
+                This is an analogue for contact. Spekaers of Language B who are in Language group A know how spekaers in group B use language B due to contact.
+** Pandas Dataframe:
+	| Meaning | list of forms         |
 	| example | [enghraifft, esimapl] |
 	
-Agents (the language groups; mediates between-group communication)
+* Agents (the language groups; mediates between-group communication)
 	Sub-Agents objects (148, based on Dunn)
 	Total Monitoring Aggregate [some average of the monitoring level of sub-agents]
 	Network links [MODEL PARAMETER]
