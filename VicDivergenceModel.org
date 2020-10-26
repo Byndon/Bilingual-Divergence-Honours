@@ -1,3 +1,4 @@
+:header:
 #+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
 #+options: author:t broken-links:nil c:nil creator:nil
 #+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
@@ -11,7 +12,10 @@
 #+select_tags: export
 #+exclude_tags: noexport
 #+creator: Emacs 26.3 (Org mode 9.3.6)
-#+PROPERTIES: header-args:python :session *Py* :noweb yes :tangle yes :eval never-export
+#+PROPERTIES: header-args:python :session *Py* :noweb yes :eval never-export
+:END:
+
+
 
 
 * Project Goals and Overview
@@ -25,21 +29,28 @@ This research question is based on Historical linguistic principles of applying 
 
 * Emacs Set-Up :noexport:
 #+begin_src emacs-lisp :results none
-  (setq-local org-babel-default-header-args:Python '((:session . "*PyABM*")))
-  org-babel-default-header-args:Python
+  ;; (setq-local org-babel-default-header-args:Python '((:session . "*PyABM*")))
+  ;; org-babel-default-header-args:Python
 #+end_src
 * The Agent/Model Setup
 #+NAME:setup
-#+begin_src python :results none
+#+begin_src python :results output :tangle model.py
   from mesa import Agent, Model
-  import random, math, matplotlib, numpy
+  import random
+  import math
+  import matplotlib
+  import numpy
   import multilevel_mesa as mlm
 #+end_src
 
+#+RESULTS: setup
+
 The SpeakerSubAgent is a class which represents the make up of the language community. This class is the basis of the Language input part of the model described in Ellison and Miceli (2017). Each individual speaker is represented as having a repertoire of languages, a language mode, and a language monitoring level. When creating a language community (an agent) the language repertoire can be determined by the adjacent language communities, or set manually. The language mode and monitor can be set manually, randomly, or determined by the ratios of other speakers in the comunity. 
 #+NAME:SpeakerSubAgent
-#+begin_src python :results output
+#+begin_src python :results output :tangle model.py
+
   class SpeakerSubAgent:
+      '''Docstring: is this how it works in python? '''
       def __init__(self, community_language, mode=False, monitoring=False):
           self.language_repertoire = []
           self.mode = 0
@@ -53,25 +64,30 @@ The SpeakerSubAgent is a class which represents the make up of the language comm
           if mode is False:
               self.mode = random.uniform(0,1)
           elif mode is True:
-              #determine mode based on others in the community.
+              # determine mode based on others in the community.
               pass
           else:
               if(0 < mode and mode < 1):
                   self.mode = mode
 
-      def monitoring_level(self):
+      def monitoring_level(self, monitoring):
           if monitoring is False:
               self.monitoring = random.uniform(0,1)
           if monitoring is True:
-              #determine monitoring based on others in the community
+              # determine monitoring based on others in the community
               pass
           else:
-              if(0 < mode and mode < 1):
+              if(0 < monitoring and monitoring < 1):
                   self.monitoring = monitoring
 #+end_src
-The Agent 
+
+#+RESULTS: SpeakerSubAgent
+
+** The Agent
+Inherits from mesa.Agent
 #+NAME:CommunityAgentClass
-#+begin_src python
+#+begin_src python :tangle model.py
+
   class CommunityAgent(Agent):
       def __init__(self, name, model):
           super().__init__(name, model)
@@ -84,21 +100,28 @@ The Agent
 
 #+end_src
 
+#+RESULTS: CommunityAgentClass
+
+** Model
+Inherits from mesa.Model
 #+NAME:NetworkedCommunities
-#+begin_src python
+#+begin_src python :tangle model.py
+
   class VicModel(Model):
       pass
 #+end_src
 
+** Language Class
 The Language class is the class representative of the languages of the communities. It is a dictionary. The Keys are the Meanings, and the values are lists of forms. As of yet, I don't know if the forms should be full forms or simply representations. It doesn't really matter for this application as far as I know.
 #+NAME:LanguageClass
-#+begin_src python
+#+begin_src python :tangle model.py
+
   class Language:
       def __init__(self):
           self.formMeaningDict = {}
 #+end_src
-
-#+NAME:Model&Data
-#+begin_src python
+** Reading in data/ getting data into a form to use.
+#+NAME:Data
+#+begin_src python :tangle model.py
 
 #+end_src
