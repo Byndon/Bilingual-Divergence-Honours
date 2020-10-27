@@ -5,19 +5,14 @@
 #+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
 #+options: timestamp:t title:t toc:t todo:t |:t
 #+title: VicDivergenceModel
-#+date: <2020-09-13 Sun>
+#+date: <2020-10-26 Mon>
 #+author: Callan Bindon
 #+email: 22242833@student.uwa.edu.au
 #+language: en
 #+select_tags: export
 #+exclude_tags: noexport
-#+creator: Emacs 26.3 (Org mode 9.3.6)
-#+PROPERTIES: header-args:python :session *Py* :noweb yes :eval never-export
+#+creator: Emacs 26.3 (Org mode 9.4)
 :END:
-
-
-
-
 * Project Goals and Overview
 #+begin_quote
 /What types of multilingual speaker interaction can help to explain the synchronic patterns of lexical difference in Victorian Aboriginal Languages?/
@@ -27,42 +22,52 @@ In this study, I will be producing various models of lexical change in an attemp
 
 This research question is based on Historical linguistic principles of applying known synchronic processes over time in an attempt to find out about the linguistic past of languages and their communities of speakers.
 
-* Emacs Set-Up :noexport:
-#+begin_src emacs-lisp :results none
-  ;; (setq-local org-babel-default-header-args:Python '((:session . "*PyABM*")))
-  ;; org-babel-default-header-args:Python
-#+end_src
-* The Agent/Model Setup
-#+NAME:setup
-#+begin_src python :results output :tangle model.py
+* Model Setup
+#+PROPERTIES: header-args:python :session *PyABM* :tangle model.py :eval never-export
+#+begin_src python :tangle model.py
   from mesa import Agent, Model
-  import random
-  import math
-  import matplotlib
-  import numpy
   import multilevel_mesa as mlm
+  import pandas
+  import csv
+#+end_src
+** The Language Class
+The language class is a class to represent the set of languages in this study. Languages are represented by dictionary objects where the Keys are Meanings /s/, and the Values are a list of tuples of form /f/ and the relative frequency of that form. A single meaning can be mapped to many synonymous forms, and as such, the tuples are inside a list.
+#+BEGIN_CENTER
+/Therefore/ Meaning : (form1,%), (from2,%), etc.
+#+END_CENTER
+The Relative frequency of the form can be determined randomly; with the generation of a random number for each of the froms, which will be divided by the total number of uses for the meaning. Thus:
+
+#+begin_src python :tangle model.py
+  class language:
+      def __init__(self):
+          self.formMeaningDict = {}
+
+      def add_from_file(filename):
+          # this method will be able to take a file, formatted as CSV
+          # and turn it into a dictionary with Meaning Keys, and
+          # a list of tuples with Form and Relative frequency
+          # relative frequency should be a parameter, but
+          # can also be randomly determined.
+          pass
 #+end_src
 
-#+RESULTS: setup
-
-The SpeakerSubAgent is a class which represents the make up of the language community. This class is the basis of the Language input part of the model described in Ellison and Miceli (2017). Each individual speaker is represented as having a repertoire of languages, a language mode, and a language monitoring level. When creating a language community (an agent) the language repertoire can be determined by the adjacent language communities, or set manually. The language mode and monitor can be set manually, randomly, or determined by the ratios of other speakers in the comunity. 
-#+NAME:SpeakerSubAgent
-#+begin_src python :results output :tangle model.py
-
-  class SpeakerSubAgent:
-      '''Docstring: is this how it works in python? '''
-      def __init__(self, community_language, mode=False, monitoring=False):
+** Agent
+The Agent in this model represents a Speaker of a set of Languages. They have language mode and language monitoring parameters and a repertoire of languages which they can use. At Each step of the model simulation, Agents will choose a  Meaning /s/, and attempt to produce a target from /t/, based on the language they are aiming to speak in. The target language will be the language that is assigned to the community of which they are a member.
+#+begin_src python :tangle model.py
+  class SpeakerAgent(Agent):
+      def __init__(self, name, model):
+          super().__init__(name, model)
+          self.name = name
           self.language_repertoire = []
           self.mode = 0
           self.monitoring = 0
-          self.language_repertoire_add(community_language)
 
       def language_repertoire_add(self, language):
           self.language_repertoire.append(language)
 
       def language_mode(self, mode):
           if mode is False:
-              self.mode = random.uniform(0,1)
+              self.mode = self.random.uniform(0, 1)
           elif mode is True:
               # determine mode based on others in the community.
               pass
@@ -79,49 +84,30 @@ The SpeakerSubAgent is a class which represents the make up of the language comm
           else:
               if(0 < monitoring and monitoring < 1):
                   self.monitoring = monitoring
-#+end_src
-
-#+RESULTS: SpeakerSubAgent
-
-** The Agent
-Inherits from mesa.Agent
-#+NAME:CommunityAgentClass
-#+begin_src python :tangle model.py
-
-  class CommunityAgent(Agent):
-      def __init__(self, name, model):
-          super().__init__(name, model)
-          self.name = name
 
       def step(self):
-          print("{} activated".format(self.name))
-          # Whatever else the agent does when activated
-
+          # implement step here.
+          # From community/group language, choose
+          #     a meaning at random.
+          # Attempt to produce the target form
+          #     using the Pc Model
+          # Whichever form was produced, add 1 to the usage of it.
+          #     (if not in target language do nothing?)
+          #     (It forms a tally of words, we can produce a percentage)
+          pass
 
 #+end_src
-
-#+RESULTS: CommunityAgentClass
 
 ** Model
-Inherits from mesa.Model
-#+NAME:NetworkedCommunities
 #+begin_src python :tangle model.py
-
-  class VicModel(Model):
-      pass
-#+end_src
-
-** Language Class
-The Language class is the class representative of the languages of the communities. It is a dictionary. The Keys are the Meanings, and the values are lists of forms. As of yet, I don't know if the forms should be full forms or simply representations. It doesn't really matter for this application as far as I know.
-#+NAME:LanguageClass
-#+begin_src python :tangle model.py
-
-  class Language:
+  class DivergenceModel(Model):
       def __init__(self):
-          self.formMeaningDict = {}
-#+end_src
-** Reading in data/ getting data into a form to use.
-#+NAME:Data
-#+begin_src python :tangle model.py
+          super().__init__()
 
+      def step(self):
+          self.schedule.step()
 #+end_src
+* Server/Visualisation Setup
+#+PROPERTIES: header-args:python :session *PyABM* :noweb yes :tangle server.py :eval never-export
+* Run Script Setup
+#+PROPERTIES: header-args:python :session *PyABM* :noweb yes :tangle run.py :eval never-export
