@@ -1,9 +1,9 @@
 :header:
 #+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
-#+options: author:t broken-links:nil c:nil creator:nil
-#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
+#+options: author:nil broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:nil e:t email:nil f:t inline:t num:t
 #+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
-#+options: timestamp:t title:t toc:t todo:t |:t
+#+options: timestamp:t title:nil toc:t todo:t |:t
 #+title: VicDivergenceModel
 #+date: <2020-10-26 Mon>
 #+author: Callan Bindon
@@ -31,16 +31,18 @@ This research question is based on Historical linguistic principles of applying 
   import csv
 #+end_src
 ** The Language Class
-The language class is a class to represent the set of languages in this study. Languages are represented by dictionary objects where the Keys are Meanings /s/, and the Values are a list of tuples of form /f/ and the relative frequency of that form. A single meaning can be mapped to many synonymous forms, and as such, the tuples are inside a list.
+The language class is a class to represent the set of languages in this study. Languages are represented by dictionary objects where the Keys are Meanings /s/, and the Values are a list of tuples of form /f/ and a tally of the number of times the form has been used.. A single meaning can be mapped to many synonymous forms, and as such, the tuples are inside a list.
 #+BEGIN_CENTER
-/Therefore/ Meaning : (form1,%), (from2,%), etc.
+/Therefore/ Meaning : (form1,tally), (from2,tally), etc.
 #+END_CENTER
 The Relative frequency of the form can be determined randomly; with the generation of a random number for each of the froms, which will be divided by the total number of uses for the meaning. Thus:
 
-#+begin_src python :tangle model.py
+#+begin_src python :tangle model.py :exports python
   class language:
-      def __init__(self):
+      def __init__(self, LanguageName):
+          self.LanguageName = LanguageName
           self.formMeaningDict = {}
+          self.speakers = ()
 
       def add_from_file(filename):
           # this method will be able to take a file, formatted as CSV
@@ -49,35 +51,86 @@ The Relative frequency of the form can be determined randomly; with the generati
           # relative frequency should be a parameter, but
           # can also be randomly determined.
           pass
+
+      def add_speaker(self, SpeakerAgent):
+          if(SpeakerAgent.L1 is self):
+              self.speakers.append(SpeakerAgent)
+              return(True)
+          else:
+              return(False)
 #+end_src
 
 ** Agent
 The Agent in this model represents a Speaker of a set of Languages. They have language mode and language monitoring parameters and a repertoire of languages which they can use. At Each step of the model simulation, Agents will choose a  Meaning /s/, and attempt to produce a target from /t/, based on the language they are aiming to speak in. The target language will be the language that is assigned to the community of which they are a member.
-#+begin_src python :tangle model.py
+
+*** Variables & arguments
+- /name/ is an argument required by the Mesa Agent parent class.
+- /model/ is an argument required by the Mesa Agent parent class.
+- /mode/ is the parameter representing how the speaker selects from their repertoire of language. In \textsc{monolingual mode} (b = 0), a speaker behaves (as similarly as possible) as a monolingual speaker would, restricting production to a single language. In \textsc{bilingual mode} (b = 1) the speaker freely mixes their languages in production.
+- /monitoring/ is a parameter representing how closely a speaker is monitoring their speech production for intrusions from another language in their repertoire.
+- /L1/ represents the native language of a speaker. This takes a Language Object, as defined in the language class.
+
+- /language_repertoire/ is a list of Language Objects that represents the Agent's proficiency in languages. If a language is in an Agent's list, the agent can proficiently use that language.    
+*** Functions/Methods
+- *language_repertoire_add(self, language)* adds the given language object to the Current Agent's (self) language_repertoire list
+- *set_language_mode(self, mode, L1)* this method sets the speaker's language mode parameter. The default value /False/ will cause the parameter to be a randomised variable (the seed for this random variable is instantiated by the Model Class).If the value is set to a float between 0 and 1, this number will be used for the mode. When the value is /True/ the value is determined based on how many languages are shared by other agents with the same L1.
+
+  This is an average of ratio of shared languages to total languages spoken by this Agent, between this Agent and all others with th same L1.
+
+Speaker 1 has (L1, l2, l3, l4, l5)
+Speaker 2 has (L1, L3, L4)
+Speaker 3 has (L1, L4, L5)
+Speaker 4 has (L1)
+
+|    | s1 | s2  | s3  | s4  |              mode: | mode fraction |
+| s1 |  1 | 3/5 | 3/5 | 1/5 |     0.466666666667 | 7/15          |
+| s2 |  1 | 1   | 2/3 | 1/3 |     0.666666666667 | 6/9           |
+| s3 |  1 | 2/4 | 1   | 1/4 | 0.5833333333333333 | 7/12          |
+| s4 |  1 | 1   | 1   | 1   |                  1 | 4/4           |
+
+If this is all good with Luisa and Mark, then great! If not I'll have to ask for some other way to determine this.
+
+- *set_monitoring_level(self, monitoring)* this method sets the monitoring level. The default value /False/ will cause the parameter to be a randomised variable (determined by the seed of the Model). If the value is set to a float between 0 and 1 this number will be used for the monitoring level. When the value is /True/ the monitoring level will be determined by the model. At the present time, this will cause the monitoring level to not be set, as I have not determined what mechanism should affect this. It could be determined by the inverse of the mode, perhaps with some weighting based on social factors?
+- *step(self)* the step method will be run for each agent at each time increment of the model. NOT CURRENTLY IMPLEMENTED. The step method is currently intended to do the following:
+  1) at each time step, choose a Meaning, /s/, from L1 (this model assume that people are remaining in their L1 groups and the target language is L1).
+  2) Attempt to prouce a form. /f/, for /s/, using P_c calculations from Ellison&Miceli 2017.
+  3) If a form that is in the target language is produced: add 1 to the tally of that form, increasing its relative frequency slightly.
+  4) If the form is not in L1 do not tally the word, this is an intrusion from another language.
+*** Code:
+#+begin_src python :tangle model.py :exports python
   class SpeakerAgent(Agent):
-      def __init__(self, name, model):
+      def __init__(self, name, model, L1, mode=False, monitoring=False):
           super().__init__(name, model)
           self.name = name
           self.language_repertoire = []
           self.mode = 0
           self.monitoring = 0
+          self.language_repertoire_add(L1)
 
       def language_repertoire_add(self, language):
           self.language_repertoire.append(language)
 
-      def language_mode(self, mode):
+      def set_language_mode(self, mode, L1):
           if mode is False:
               self.mode = self.random.uniform(0, 1)
           elif mode is True:
-              # determine mode based on others in the community.
-              pass
+              # This need to be checked for issues, I'm not thinking right now. 
+              mode = 0
+              i = 0 # keeps track of the current average for self to the current speaker from L1.speakers.
+              for sameLangSpeakers in L1.speakers:
+                  j = 0 # keeps track of the numbers of shared languages between self and speaker.
+                  for lang in sameLangSpeakers:
+                      if(lang in self.language_repertoire):
+                          j += 1 # tally increase, another shared language is found.
+                  i += j/len(lang) # calculate the percentage of shared languages between self and currentspeaker.
+               mode += i/len(sameLangSpeakers) # set mode to the average of repertoire.
           else:
               if(0 < mode and mode < 1):
                   self.mode = mode
 
-      def monitoring_level(self, monitoring):
+      def set_monitoring_level(self, monitoring):
           if monitoring is False:
-              self.monitoring = random.uniform(0,1)
+              self.monitoring = self.random.uniform(0, 1)
           if monitoring is True:
               # determine monitoring based on others in the community
               pass
@@ -99,10 +152,15 @@ The Agent in this model represents a Speaker of a set of Languages. They have la
 #+end_src
 
 ** Model
-#+begin_src python :tangle model.py
+#+begin_src python :tangle model.py :exports python
   class DivergenceModel(Model):
-      def __init__(self):
+      def __init__(self, seed=12345):
           super().__init__()
+          self.schedule = mlm.Multilevel_Mesa(self)
+
+          for a in range(model_population):
+              a = Agent()
+              self.schedule.add(a)
 
       def step(self):
           self.schedule.step()
