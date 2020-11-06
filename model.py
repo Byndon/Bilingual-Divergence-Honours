@@ -119,15 +119,15 @@ class DivergenceModel(Model):
 
 # define language objects.
 # i don't currently care about the words and stuff
-schmingglebob = language("Schmingglebob")
-schitchyapants = language("Schitchyapants")
-gobbledegook = language("Gobbledegook")
+Language1 = language("Language1")
+Language2 = language("Language2")
+Language3 = language("Language3")
 # make a list of the languages to give to the model.
-languageList = [schmingglebob, schitchyapants, gobbledegook]
+languageList = [Language1, Language2, Language3]
 
 # make the model. 
-testingmodel = DivergenceModel(20, languageList)
-
+testingmodel = DivergenceModel(30, languageList)
+# step the model once.
 testingmodel.step()
 
 # fix this it needs to step over each agent and add another random language to its language repertoire
