@@ -3,10 +3,7 @@ from mesa.time import RandomActivation
 import multilevel_mesa as mlm
 import pandas
 import csv
-
-
-def function():
-    pass
+import networkx as nx
 
 class language:
     def __init__(self, LanguageName):
@@ -14,7 +11,7 @@ class language:
         self.formMeaningDict = {}
         self.speakers = []
 
-    def add_from_file(filename):
+    def add_from_file(self, filename):
         # this method will be able to take a file, formatted as CSV
         # and turn it into a dictionary with Meaning Keys, and
         # a list of tuples with Form and Relative frequency
@@ -24,7 +21,8 @@ class language:
         pass
 
     def add_meaning(self, meaning, formTupleList):
-        if(type(formTupleList) is list):
+        if(type(formTupleList) is list and all([True for t in formTupleList if type(t) is tuple])):
+            # check if the formTupleList given is a list, and that the list contains tuples. 
             self.formMeaningDict[meaning] = formTupleList
             return(True)
         else:
@@ -48,6 +46,7 @@ class SpeakerAgent(Agent):
         self.monitoring = 0
         self.set_monitoring_level(monitoring)
         self.language_repertoire_add(L1)
+        self.L1 = L1
 
     def language_repertoire_add(self, language):
         self.language_repertoire.append(language)
@@ -80,17 +79,89 @@ class SpeakerAgent(Agent):
             if(0 < monitoring and monitoring < 1):
                 self.monitoring = monitoring
 
+
+    def select_meaning(self):
+        # randint is inclusive of the begin and end numbers.
+        # select which meaning key is used from all possible meanings in one of the agent's languages.
+        # meanaings are the keys for the dictionary
+
+        meaning_chosen = self.random.choice(list(self.language_repertoire[self.L1].formMeaningDict.keys()))
+
+        return meaning_chosen
+
+
+    def Calculate_R_fs_l(self, form, meaning, language):
+        # what is the frequency of this form being associated with
+        # this meaning in this language?
+
+        # find the index of the form in the list of forms.
+        formTally = 0
+        for formTuple in language.formMeaningDict[meaning]:
+            if formTuple[0] == form:
+                formTally = formTuple[1]
+                break
+
+        # find the total number of usages of the meaning.
+        total_meaning_tally = 0
+        for formTuple in language.formMeaningDict[meaning]:
+            total_meaning_tally += formTuple[1]
+
+        # return the percentage of the form to the total usage of the meaning
+        # i.e. how frequent this form is when expressing this meaning.
+        return(formTally/total_meaning_tally)
+
+    def Calculate_PM_f_sl(self, form, meaning, language):
+        # Equation 1 in Ellison&Miceli 2017
+        # calculate the relative ferquency of the form in language for meaning
+        relative_frequency_f = Calculate_R_fs_l(form, meaning, language)
+
+        # what I THINK This is doing:
+        # creating a list of the results from Cacluate_R_fs_l
+        # and summing the contents of the list with math.fsum()
+        # i KNOW this will be inefficient, as it is calculating the total_meaning_tally each time.
+        marginal_frequeny = math.fsum([Calculate_R_fs_l(forms[0], meaning, language) for forms in language.formMeaningDict[meaning]])
+
+        return(relative_frequency_f/marginal_frequeny)
+
+    def Calculate_P2M_f_st(self, form, meaning, language, target):
+        # Equation 2 in Ellison&Miceli 2017
+        k_delta = 0
+        if language.LanguageName == target:
+            k_delta = 1
+
+        return(k_delta*Calculate_R_fs_l(form, meaning, language))
+
+    def Calculate_PBM_f_s(self, form, meaning, language):
+        # Equation 3 in Ellison&Miceli 2017
+        L = len(self.language_repertoire)
+
+        PBM = 0
+        for language in self.language_repertoire:
+            PM = Calculate_PM_f_sl(form, meaning, language)
+            PBM += 1/len(self.language_repertoire)*PM
+
+        return(PBM)
+
+    def Calculate_PG_f_stb(self, form, meaning, target, b_mode):
+        # Equation 4 in Ellison&Miceli 2017
+        P2M = Calculate_P2M_f_st(form, meaning, language, target)
+        PBM = Calculate_PBM_f_s(form, meaning, language)
+
+        return((1-b_mode)*P2M+b_mode*PBM)
+
+    def Calculate_PL_l_fstbm(self, form, meaning, language, target, b_mode, monitoring):
+        pass
+
+    def Cacluate_PC_f_stbm(self):
+        pass
+
     def step(self):
-        # implement step here.
-        # From community/group language, choose
-        #     a meaning at random.
-        # Attempt to produce the target form
-        #     using the Pc Model
-        # Whichever form was produced, add 1 to the NewTally, for use in the next step.
-        #     (if not in target language do nothing?)
-        #     (It forms a tally of words, we can produce a percentage)
-        print("I am SpeakerAgent {}, my language is {}, I am monitoring with an intensity of {} and my bilingual mode is {}".format(self.name, self.language_repertoire[0].LanguageName, str(self.monitoring), str(self.mode)))
-        return(True)
+        pass
+        # pick a random meaning from agent's L1.
+        # calculate the relative frequency of form f.
+        # old step, which didn't do anything except show that my model would run. 
+        # print("I am SpeakerAgent {}, my language is {}, I am monitoring with an intensity of {} and my bilingual mode is {}".format(self.name, self.language_repertoire[0].LanguageName, str(self.monitoring), str(self.mode)))
+        # return(True)
 
 class DivergenceModel(Model):
     def __init__(self, model_population, language_object_list, seed=12345):

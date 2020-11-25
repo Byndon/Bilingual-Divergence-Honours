@@ -1,5 +1,5 @@
 :header:
-#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:{} arch:headline
 #+options: author:nil broken-links:nil c:nil creator:nil
 #+options: d:(not "LOGBOOK") date:nil e:t email:nil f:t inline:t num:t
 #+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
@@ -12,8 +12,14 @@
 #+select_tags: export
 #+exclude_tags: noexport
 #+creator: Emacs 26.3 (Org mode 9.4)
+#+LATEX_HEADER: \usepackage{listings}
+:END:
+:noteOnWriting:
+listings latex package to format code properly. 
 :END:
 * Project Goals and Overview
+\lstset{language=Python}
+
 #+begin_quote
 /What types of multilingual speaker interaction can help to explain the synchronic patterns of lexical difference in Victorian Aboriginal Languages?/
 #+end_quote
@@ -22,7 +28,10 @@ In this study, I will be producing various models of lexical change in an attemp
 
 This research question is based on Historical linguistic principles of applying known synchronic processes over time in an attempt to find out about the linguistic past of languages and their communities of speakers.
 
+The Victorian Languages are comprised of 3 groups; listed from west to east in general geographical area, they are: Upper-Murray languages, Kulin languages, Gippsland languages (Hercus, L.A.)
+
 * Model Setup
+** Python Header
 #+PROPERTIES: header-args:python :session *PyABM* :tangle model.py :eval never-export
 #+begin_src python :tangle model.py
   from mesa import Agent, Model
@@ -30,11 +39,9 @@ This research question is based on Historical linguistic principles of applying 
   import multilevel_mesa as mlm
   import pandas
   import csv
-
-
-  def function():
-      pass
+  import networkx as nx
 #+end_src
+
 ** The Language Class
 The language class is a class to represent the set of languages in this study. Languages are represented by dictionary objects where the Keys are Meanings /s/, and the Values are a list of tuples of form /f/, a tally of the number of times the form has been used, and a tally that is updated at each step. A single meaning can be mapped to many synonymous forms, and as such, the tuples are inside a list.
 
@@ -49,14 +56,25 @@ Ask mark or Luisa if this is something that I should consider doing.
 #+END_CENTER
 The Relative frequency of the form can be determined randomly; with the generation of a random number for each of the forms, which will be divided by the total number of uses for the meaning.
 
+In order to identify the form for t = l checking, the last character of the form strig should be an identifier associated with the language which it is a part of. I also need this system to be able to account for borrowing. So perhaps something like: if form[-1].isdigit() and form[-1] = targetlanguageid: do x, elif form[-1].is
+*** Variables and arguments
+- LanguageName :: is an argument which is used to correlate real-world languages with the simulation. A variable of the same name keeps track of this in the model.
+- formMeaningDict :: is a dictionary which kees track of the meanings across languages. It has keys which are the English meta-language meaning of the lexical items and its values are lists of tuples which contain the /form/ of the lexical item, a tally of its use frequency, and a counter which will increase its frequency depending on its use in any step() after all agents have acted, so that the new frequency only affects the subsequent step.
+- speakers :: is a list which contains the speakerAgent objects which have this language as their L1, i.e. the 0th item in their language repertoire list is this object.  
+*** MEthods and Functions
+- add_from_file(self, filename) :: this function will take data from a format and convert it to key : value pairs for insertion into the /formMeaningDict/ dictionary.
+- add_meaning(self, meaning, formTupleList) :: is a fuction which takes a meaning string, and a list of tuples and adds it to the dictionary of the language.
+- add_speaker(self, SpeakerAgent) :: takes a speakerAgent object and adds the object to the list of speakers for the language.
+
+*** Code
 #+begin_src python :tangle model.py :exports python
   class language:
-      def __init__(self, LanguageName):
+n      def __init__(self, LanguageName):
           self.LanguageName = LanguageName
           self.formMeaningDict = {}
           self.speakers = []
 
-      def add_from_file(filename):
+      def add_from_file(self, filename):
           # this method will be able to take a file, formatted as CSV
           # and turn it into a dictionary with Meaning Keys, and
           # a list of tuples with Form and Relative frequency
@@ -66,7 +84,8 @@ The Relative frequency of the form can be determined randomly; with the generati
           pass
 
       def add_meaning(self, meaning, formTupleList):
-          if(type(formTupleList) is list):
+          if(type(formTupleList) is list and all([True for t in formTupleList if type(t) is tuple])):
+              # check if the formTupleList given is a list, and that the list contains tuples. 
               self.formMeaningDict[meaning] = formTupleList
               return(True)
           else:
@@ -85,18 +104,17 @@ The Relative frequency of the form can be determined randomly; with the generati
 The Agent in this model represents a Speaker of a set of Languages. They have language mode and language monitoring parameters and a repertoire of languages which they can use. At Each step of the model simulation, Agents will choose a  Meaning /s/, and attempt to produce a target from /t/, based on the language they are aiming to speak in. The target language will be the language that is assigned to the community of which they are a member.
 
 *** Variables & arguments
-- /name/ is an argument required by the Mesa Agent parent class.
-- /model/ is an argument required by the Mesa Agent parent class.
-- /mode/ is the parameter representing how the speaker selects from their repertoire of language. In \textsc{monolingual mode} (b = 0), a speaker behaves (as similarly as possible) as a monolingual speaker would, restricting production to a single language. In \textsc{bilingual mode} (b = 1) the speaker freely mixes their languages in production.
-- /monitoring/ is a parameter representing how closely a speaker is monitoring their speech production for intrusions from another language in their repertoire.
-- /L1/ represents the native language of a speaker. This takes a Language Object, as defined in the language class.
-
-- /language_repertoire/ is a list of Language Objects that represents the Agent's proficiency in languages. If a language is in an Agent's list, the agent can proficiently use that language.    
+- name :: is an argument required by the Mesa Agent parent class.
+- model :: is an argument required by the Mesa Agent parent class.
+- mode :: is the parameter representing how the speaker selects from their repertoire of language. In \textsc{monolingual mode} (b = 0), a speaker behaves (as similarly as possible) as a monolingual speaker would, restricting production to a single language. In \textsc{bilingual mode} (b = 1) the speaker freely mixes their languages in production.
+- monitoring :: is a parameter representing how closely a speaker is monitoring their speech production for intrusions from another language in their repertoire.
+- L1 :: represents the native language of a speaker. This takes a Language Object, as defined in the language class.
+- language_repertoire :: is a list of Language Objects that represents the Agent's proficiency in languages. If a language is in an Agent's list, the agent can proficiently use that language.    
 *** Functions/Methods
-- *language_repertoire_add(self, language)* adds the given language object to the Current Agent's (self) language_repertoire list
-- *set_language_mode(self, mode, L1)* this method sets the speaker's language mode parameter. The default value /False/ will cause the parameter to be a randomised variable (the seed for this random variable is instantiated by the Model Class).If the value is set to a float between 0 and 1, this number will be used for the mode. When the value is /True/ the value is determined based on how many languages are shared by other agents with the same L1.
+- language_repertoire_add(self, language) :: adds the given language object to the Current Agent's (self) language_repertoire list
+- set_language_mode(self, mode, L1) :: this method sets the speaker's language mode parameter. The default value /False/ will cause the parameter to be a randomised variable (the seed for this random variable is instantiated by the Model Class).If the value is set to a float between 0 and 1, this number will be used for the mode. When the value is /True/ the value is determined based on how many languages are shared by other agents with the same L1.
 
-  This is an average of ratio of shared languages to total languages spoken by this Agent, between this Agent and all others with th same L1.
+  This is an average of the ratio of shared languages to total languages spoken by this Agent, between this Agent and all others with th same L1.
 
 Speaker 1 has (L1, l2, l3, l4, l5);
 Speaker 2 has (L1, L3, L4);
@@ -111,12 +129,12 @@ Speaker 4 has (L1)
 
 If this is all good with Luisa and Mark, then great! If not I'll have to ask for some other way to determine this.
 
-- *set_monitoring_level(self, monitoring)* this method sets the monitoring level. The default value /False/ will cause the parameter to be a randomised variable (determined by the seed of the Model). If the value is set to a float between 0 and 1 this number will be used for the monitoring level. When the value is /True/ the monitoring level will be determined by the model. At the present time, this will cause the monitoring level to not be set, as I have not determined what mechanism should affect this. It could be determined by the inverse of the mode -1 (\( \frac{1}{mode} - 1 \)) or as 1-mode.
-- *step(self)* the step method will be run for each agent at each time increment of the model. NOT CURRENTLY IMPLEMENTED. The step method is currently intended to do the following:
-  1) at each time step, choose a Meaning, /s/, from L1 (this model assume that people are remaining in their L1 groups and the target language is L1).
-  2) Attempt to prouce a form. /f/, for /s/, using P_c calculations from Ellison&Miceli 2017.
-  3) If a form that is in the target language is produced: add 1 to the tally of that form, increasing its relative frequency slightly.
-  4) If the form is not in L1 do not tally the word, this is an intrusion from another language.
+- set_monitoring_level(self, monitoring) :: this method sets the monitoring level. The default value /False/ will cause the parameter to be a randomised variable (determined by the seed of the Model). If the value is set to a float between 0 and 1 this number will be used for the monitoring level. When the value is /True/ the monitoring level will be determined by the model. At the present time, this will cause the monitoring level to not be set, as I have not determined what mechanism should affect this. It could be determined by the inverse of the mode -1 (\( \frac{1}{mode} - 1 \)) or as 1-mode.
+
+- step(self) :: is the method executed each time the Agent is  activated by the Model.
+  1. choose a meaning, s, to express
+  2. calculate posterior probabilities for all the forms, f, across the speaker's languages, L, which can be used to express that meaning.
+  3. select the form, f, with the greatest posterior probability to produce. 
 *** Code:
 #+begin_src python :tangle model.py :exports python
   class SpeakerAgent(Agent):
@@ -129,6 +147,7 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
           self.monitoring = 0
           self.set_monitoring_level(monitoring)
           self.language_repertoire_add(L1)
+          self.L1 = L1
 
       def language_repertoire_add(self, language):
           self.language_repertoire.append(language)
@@ -161,17 +180,90 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
               if(0 < monitoring and monitoring < 1):
                   self.monitoring = monitoring
 
+
+      def select_meaning(self):
+          # randint is inclusive of the begin and end numbers.
+          # select which meaning key is used from all possible meanings in one of the agent's languages.
+          # meanaings are the keys for the dictionary
+
+          meaning_chosen = self.random.choice(list(self.language_repertoire[self.L1].formMeaningDict.keys()))
+
+          return meaning_chosen
+
+
+      def Calculate_R_fs_l(self, form, meaning, language):
+          # what is the frequency of this form being associated with
+          # this meaning in this language?
+
+          # find the index of the form in the list of forms.
+          formTally = 0
+          for formTuple in language.formMeaningDict[meaning]:
+              if formTuple[0] == form:
+                  formTally = formTuple[1]
+                  break
+
+          # find the total number of usages of the meaning.
+          total_meaning_tally = 0
+          for formTuple in language.formMeaningDict[meaning]:
+              total_meaning_tally += formTuple[1]
+
+          # return the percentage of the form to the total usage of the meaning
+          # i.e. how frequent this form is when expressing this meaning.
+          return(formTally/total_meaning_tally)
+
+      def Calculate_PM_f_sl(self, form, meaning, language):
+          # Equation 1 in Ellison&Miceli 2017
+          # calculate the relative ferquency of the form in language for meaning
+          relative_frequency_f = Calculate_R_fs_l(form, meaning, language)
+
+          # what I THINK This is doing:
+          # creating a list of the results from Cacluate_R_fs_l
+          # and summing the contents of the list with math.fsum()
+          # i KNOW this will be inefficient, as it is calculating the total_meaning_tally each time.
+          marginal_frequeny = math.fsum([Calculate_R_fs_l(forms[0], meaning, language) for forms in language.formMeaningDict[meaning]])
+
+          return(relative_frequency_f/marginal_frequeny)
+
+      def Calculate_P2M_f_st(self, form, meaning, language, target):
+          # Equation 2 in Ellison&Miceli 2017
+          k_delta = 0
+          if language.LanguageName == target:
+              k_delta = 1
+
+          return(k_delta*Calculate_R_fs_l(form, meaning, language))
+
+      def Calculate_PBM_f_s(self, form, meaning, language):
+          # Equation 3 in Ellison&Miceli 2017
+          L = len(self.language_repertoire)
+
+          PBM = 0
+          for language in self.language_repertoire:
+              PM = Calculate_PM_f_sl(form, meaning, language)
+              PBM += 1/len(self.language_repertoire)*PM
+
+          return(PBM)
+
+      def Calculate_PG_f_stb(self, form, meaning, target, b_mode):
+          # Equation 4 in Ellison&Miceli 2017
+          P2M = Calculate_P2M_f_st(form, meaning, language, target)
+          PBM = Calculate_PBM_f_s(form, meaning, language)
+
+          return((1-b_mode)*P2M+b_mode*PBM)
+
+      def Calculate_PL_l_fstbm(self, form, meaning, language, target, b_mode, monitoring):
+          pass
+
+      def Cacluate_PC_f_stbm(self):
+          pass
+
       def step(self):
-          # implement step here.
-          # From community/group language, choose
-          #     a meaning at random.
-          # Attempt to produce the target form
-          #     using the Pc Model
-          # Whichever form was produced, add 1 to the NewTally, for use in the next step.
-          #     (if not in target language do nothing?)
-          #     (It forms a tally of words, we can produce a percentage)
-          print("I am SpeakerAgent {}, my language is {}, I am monitoring with an intensity of {} and my bilingual mode is {}".format(self.name, self.language_repertoire[0].LanguageName, str(self.monitoring), str(self.mode)))
-          return(True)
+          pass
+          # pick a random meaning from agent's L1.
+          # calculate the relative frequency of form f.
+          # old step, which didn't do anything except show that my model would run. 
+          # print("I am SpeakerAgent {}, my language is {}, I am monitoring with an intensity of {} and my bilingual mode is {}".format(self.name, self.language_repertoire[0].LanguageName, str(self.monitoring), str(self.mode)))
+          # return(True)
+        
 #+end_src
 
 ** Model
@@ -204,6 +296,7 @@ The Model is the class which is responsible for activating the agents at each ti
           # here i must also set the NewTally equal to the Tally, so that the new frequencies can be used in the next time step, unless the frequency being updated with each use is intended.
 #+end_src
 ** Testing the model at its current level of completeness
+This should proably be done in another file, but for now this will do. 
 #+begin_src python :tangle model.py :exports python
   # define language objects.
   # i don't currently care about the words and stuff
