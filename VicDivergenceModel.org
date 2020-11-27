@@ -36,10 +36,10 @@ The Victorian Languages are comprised of 3 groups; listed from west to east in g
 #+begin_src python :tangle model.py
   from mesa import Agent, Model
   from mesa.time import RandomActivation
-  import multilevel_mesa as mlm
+  import multilevel_mesa as mlm  # multilevel esa package may not be used, in favour of rolling my own networkx solution
   import pandas
   import csv
-  import networkx as nx
+  import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
 #+end_src
 
 ** The Language Class
@@ -61,7 +61,7 @@ In order to identify the form for t = l checking, the last character of the form
 - LanguageName :: is an argument which is used to correlate real-world languages with the simulation. A variable of the same name keeps track of this in the model.
 - formMeaningDict :: is a dictionary which kees track of the meanings across languages. It has keys which are the English meta-language meaning of the lexical items and its values are lists of tuples which contain the /form/ of the lexical item, a tally of its use frequency, and a counter which will increase its frequency depending on its use in any step() after all agents have acted, so that the new frequency only affects the subsequent step.
 - speakers :: is a list which contains the speakerAgent objects which have this language as their L1, i.e. the 0th item in their language repertoire list is this object.  
-*** MEthods and Functions
+*** Methods and Functions
 - add_from_file(self, filename) :: this function will take data from a format and convert it to key : value pairs for insertion into the /formMeaningDict/ dictionary.
 - add_meaning(self, meaning, formTupleList) :: is a fuction which takes a meaning string, and a list of tuples and adds it to the dictionary of the language.
 - add_speaker(self, SpeakerAgent) :: takes a speakerAgent object and adds the object to the list of speakers for the language.
@@ -69,7 +69,7 @@ In order to identify the form for t = l checking, the last character of the form
 *** Code
 #+begin_src python :tangle model.py :exports python
   class language:
-n      def __init__(self, LanguageName):
+      def __init__(self, LanguageName):
           self.LanguageName = LanguageName
           self.formMeaningDict = {}
           self.speakers = []
@@ -98,8 +98,40 @@ n      def __init__(self, LanguageName):
               return(True)
           else:
               return(False)
+
+      def borrow_form(self):
+          # this function is for the chance for a language to gain a borrowing.
+          # Borrowings should be marked accordingly with an addition to the
+          # string indicating where they were brrowed from.
+          pass
+
+      def lose_form(self):
+          # this function is for the chance that a form becomes so obscure that
+          # it is no longer used in the language.
+          # This can also occur randomly to kick-start the bias process.
+          # need to figure out the randomness before implementing.
+          pass
 #+end_src
 
+** The Community Class
+*** About
+The Community class is the class which is used to group Speaker agents into communities of speakers. The Community object are then linked together on a network using networkx. 
+*** code
+#+begin_src python :tangle model.py
+  class Community:
+      def __init__(self, name):
+          self.communityname = name
+          self.communitymembers = []
+
+      def add_members(self, SpeakerAgent):
+          if(type(SpeakerAgent) is SpeakerAgent):
+              self.communitymembers.append[SpeakerAgent]
+          else:
+              print("not a speakerAgent")
+
+      def list_members(self):
+          print(self.communitymembers)
+#+end_src
 ** Agent
 The Agent in this model represents a Speaker of a set of Languages. They have language mode and language monitoring parameters and a repertoire of languages which they can use. At Each step of the model simulation, Agents will choose a  Meaning /s/, and attempt to produce a target from /t/, based on the language they are aiming to speak in. The target language will be the language that is assigned to the community of which they are a member.
 
@@ -148,9 +180,17 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
           self.set_monitoring_level(monitoring)
           self.language_repertoire_add(L1)
           self.L1 = L1
+          self.community = None
 
       def language_repertoire_add(self, language):
           self.language_repertoire.append(language)
+
+      def define_community(self, community):
+          if(type(community) is Community):
+              self.community = community
+
+              # For setting this up, after agents are assigned to a community,
+              # loop through them and set their community.
 
       def set_language_mode(self, mode, L1):
           if mode is False:
@@ -263,7 +303,7 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
           # old step, which didn't do anything except show that my model would run. 
           # print("I am SpeakerAgent {}, my language is {}, I am monitoring with an intensity of {} and my bilingual mode is {}".format(self.name, self.language_repertoire[0].LanguageName, str(self.monitoring), str(self.mode)))
           # return(True)
-        
+
 #+end_src
 
 ** Model

@@ -1,9 +1,9 @@
 from mesa import Agent, Model
 from mesa.time import RandomActivation
-import multilevel_mesa as mlm
+import multilevel_mesa as mlm  # multilevel esa package may not be used, in favour of rolling my own networkx solution
 import pandas
 import csv
-import networkx as nx
+import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
 
 class language:
     def __init__(self, LanguageName):
@@ -36,6 +36,33 @@ class language:
         else:
             return(False)
 
+    def borrow_form(self):
+        # this function is for the chance for a language to gain a borrowing.
+        # Borrowings should be marked accordingly with an addition to the
+        # string indicating where they were brrowed from.
+        pass
+
+    def lose_form(self):
+        # this function is for the chance that a form becomes so obscure that
+        # it is no longer used in the language.
+        # This can also occur randomly to kick-start the bias process.
+        # need to figure out the randomness before implementing.
+        pass
+
+class Community:
+    def __init__(self, name):
+        self.communityname = name
+        self.communitymembers = []
+
+    def add_members(self, SpeakerAgent):
+        if(type(SpeakerAgent) is SpeakerAgent):
+            self.communitymembers.append[SpeakerAgent]
+        else:
+            print("not a speakerAgent")
+
+    def list_members(self):
+        print(self.communitymembers)
+
 class SpeakerAgent(Agent):
     def __init__(self, name, model, L1, mode=False, monitoring=False):
         super().__init__(name, model)
@@ -47,9 +74,17 @@ class SpeakerAgent(Agent):
         self.set_monitoring_level(monitoring)
         self.language_repertoire_add(L1)
         self.L1 = L1
+        self.community = None
 
     def language_repertoire_add(self, language):
         self.language_repertoire.append(language)
+
+    def define_community(self, community):
+        if(type(community) is Community):
+            self.community = community
+
+            # For setting this up, after agents are assigned to a community,
+            # loop through them and set their community.
 
     def set_language_mode(self, mode, L1):
         if mode is False:
