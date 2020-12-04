@@ -37,6 +37,7 @@ The Victorian Languages are comprised of 3 groups; listed from west to east in g
   from mesa import Agent, Model
   from mesa.time import RandomActivation
   import multilevel_mesa as mlm  # multilevel esa package may not be used, in favour of rolling my own networkx solution
+  import math
   import pandas
   import csv
   import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
@@ -56,7 +57,7 @@ Ask mark or Luisa if this is something that I should consider doing.
 #+END_CENTER
 The Relative frequency of the form can be determined randomly; with the generation of a random number for each of the forms, which will be divided by the total number of uses for the meaning.
 
-In order to identify the form for t = l checking, the last character of the form strig should be an identifier associated with the language which it is a part of. I also need this system to be able to account for borrowing. So perhaps something like: if form[-1].isdigit() and form[-1] = targetlanguageid: do x, elif form[-1].is
+In order to identify the form for t = l checking, the last character of the form strig should be an identifier associated with the language which it is a part of. I also need this system to be able to account for borrowing (not necessarily for the speakers, but rather for data collection). So perhaps something like: if(form[-1].isdigit() and form[-1] == targetlanguageid): do x, elif form[-1].is
 *** Variables and arguments
 - LanguageName :: is an argument which is used to correlate real-world languages with the simulation. A variable of the same name keeps track of this in the model.
 - formMeaningDict :: is a dictionary which kees track of the meanings across languages. It has keys which are the English meta-language meaning of the lexical items and its values are lists of tuples which contain the /form/ of the lexical item, a tally of its use frequency, and a counter which will increase its frequency depending on its use in any step() after all agents have acted, so that the new frequency only affects the subsequent step.
@@ -220,16 +221,15 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
               if(0 < monitoring and monitoring < 1):
                   self.monitoring = monitoring
 
-
       def select_meaning(self):
           # randint is inclusive of the begin and end numbers.
           # select which meaning key is used from all possible meanings in one of the agent's languages.
           # meanaings are the keys for the dictionary
+          # I use L1 just out of convenience, all languages can express the same meanings.
 
           meaning_chosen = self.random.choice(list(self.language_repertoire[self.L1].formMeaningDict.keys()))
 
           return meaning_chosen
-
 
       def Calculate_R_fs_l(self, form, meaning, language):
           # what is the frequency of this form being associated with
@@ -254,13 +254,13 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
       def Calculate_PM_f_sl(self, form, meaning, language):
           # Equation 1 in Ellison&Miceli 2017
           # calculate the relative ferquency of the form in language for meaning
-          relative_frequency_f = Calculate_R_fs_l(form, meaning, language)
+          relative_frequency_f = self.Calculate_R_fs_l(form, meaning, language)
 
           # what I THINK This is doing:
           # creating a list of the results from Cacluate_R_fs_l
           # and summing the contents of the list with math.fsum()
           # i KNOW this will be inefficient, as it is calculating the total_meaning_tally each time.
-          marginal_frequeny = math.fsum([Calculate_R_fs_l(forms[0], meaning, language) for forms in language.formMeaningDict[meaning]])
+          marginal_frequeny = math.fsum([self.Calculate_R_fs_l(form[0], meaning, language) for forms in language.formMeaningDict[meaning]])
 
           return(relative_frequency_f/marginal_frequeny)
 
@@ -270,7 +270,7 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
           if language.LanguageName == target:
               k_delta = 1
 
-          return(k_delta*Calculate_R_fs_l(form, meaning, language))
+          return(k_delta*self.Calculate_R_fs_l(form, meaning, language))
 
       def Calculate_PBM_f_s(self, form, meaning, language):
           # Equation 3 in Ellison&Miceli 2017
@@ -278,15 +278,15 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
 
           PBM = 0
           for language in self.language_repertoire:
-              PM = Calculate_PM_f_sl(form, meaning, language)
-              PBM += 1/len(self.language_repertoire)*PM
+              PM = self.Calculate_PM_f_sl(form, meaning, language)
+              PBM += 1/L*PM
 
           return(PBM)
 
-      def Calculate_PG_f_stb(self, form, meaning, target, b_mode):
+      def Calculate_PG_f_stb(self, form, meaning, target, b_mode, language):
           # Equation 4 in Ellison&Miceli 2017
-          P2M = Calculate_P2M_f_st(form, meaning, language, target)
-          PBM = Calculate_PBM_f_s(form, meaning, language)
+          P2M = self.Calculate_P2M_f_st(form, meaning, language, target)
+          PBM = self.Calculate_PBM_f_s(form, meaning, language)
 
           return((1-b_mode)*P2M+b_mode*PBM)
 

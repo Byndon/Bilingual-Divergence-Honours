@@ -1,6 +1,7 @@
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 import multilevel_mesa as mlm  # multilevel esa package may not be used, in favour of rolling my own networkx solution
+import math
 import pandas
 import csv
 import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
@@ -114,16 +115,15 @@ class SpeakerAgent(Agent):
             if(0 < monitoring and monitoring < 1):
                 self.monitoring = monitoring
 
-
     def select_meaning(self):
         # randint is inclusive of the begin and end numbers.
         # select which meaning key is used from all possible meanings in one of the agent's languages.
         # meanaings are the keys for the dictionary
+        # I use L1 just out of convenience, all languages can express the same meanings.
 
         meaning_chosen = self.random.choice(list(self.language_repertoire[self.L1].formMeaningDict.keys()))
 
         return meaning_chosen
-
 
     def Calculate_R_fs_l(self, form, meaning, language):
         # what is the frequency of this form being associated with
@@ -148,13 +148,13 @@ class SpeakerAgent(Agent):
     def Calculate_PM_f_sl(self, form, meaning, language):
         # Equation 1 in Ellison&Miceli 2017
         # calculate the relative ferquency of the form in language for meaning
-        relative_frequency_f = Calculate_R_fs_l(form, meaning, language)
+        relative_frequency_f = self.Calculate_R_fs_l(form, meaning, language)
 
         # what I THINK This is doing:
         # creating a list of the results from Cacluate_R_fs_l
         # and summing the contents of the list with math.fsum()
         # i KNOW this will be inefficient, as it is calculating the total_meaning_tally each time.
-        marginal_frequeny = math.fsum([Calculate_R_fs_l(forms[0], meaning, language) for forms in language.formMeaningDict[meaning]])
+        marginal_frequeny = math.fsum([self.Calculate_R_fs_l(form[0], meaning, language) for forms in language.formMeaningDict[meaning]])
 
         return(relative_frequency_f/marginal_frequeny)
 
@@ -164,7 +164,7 @@ class SpeakerAgent(Agent):
         if language.LanguageName == target:
             k_delta = 1
 
-        return(k_delta*Calculate_R_fs_l(form, meaning, language))
+        return(k_delta*self.Calculate_R_fs_l(form, meaning, language))
 
     def Calculate_PBM_f_s(self, form, meaning, language):
         # Equation 3 in Ellison&Miceli 2017
@@ -172,15 +172,15 @@ class SpeakerAgent(Agent):
 
         PBM = 0
         for language in self.language_repertoire:
-            PM = Calculate_PM_f_sl(form, meaning, language)
-            PBM += 1/len(self.language_repertoire)*PM
+            PM = self.Calculate_PM_f_sl(form, meaning, language)
+            PBM += 1/L*PM
 
         return(PBM)
 
-    def Calculate_PG_f_stb(self, form, meaning, target, b_mode):
+    def Calculate_PG_f_stb(self, form, meaning, target, b_mode, language):
         # Equation 4 in Ellison&Miceli 2017
-        P2M = Calculate_P2M_f_st(form, meaning, language, target)
-        PBM = Calculate_PBM_f_s(form, meaning, language)
+        P2M = self.Calculate_P2M_f_st(form, meaning, language, target)
+        PBM = self.Calculate_PBM_f_s(form, meaning, language)
 
         return((1-b_mode)*P2M+b_mode*PBM)
 
