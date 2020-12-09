@@ -154,7 +154,7 @@ class SpeakerAgent(Agent):
         # creating a list of the results from Cacluate_R_fs_l
         # and summing the contents of the list with math.fsum()
         # i KNOW this will be inefficient, as it is calculating the total_meaning_tally each time.
-        marginal_frequeny = math.fsum([self.Calculate_R_fs_l(form[0], meaning, language) for forms in language.formMeaningDict[meaning]])
+        marginal_frequeny = math.fsum([self.Calculate_R_fs_l(form[0], meaning, language) for form in language.formMeaningDict[meaning]])
 
         return(relative_frequency_f/marginal_frequeny)
 
@@ -184,11 +184,35 @@ class SpeakerAgent(Agent):
 
         return((1-b_mode)*P2M+b_mode*PBM)
 
-    def Calculate_PL_l_fstbm(self, form, meaning, language, target, b_mode, monitoring):
-        pass
+    def Calculate_k_L(self, form, meaning):
+        # k_L = \frac{1}{\sum_{l \in L} P_M(f|s;l)}
+        # turn this into a list comprehension and sum it's values with fsum.
+        # for language in self.language_repertoire:
+        #     self.Calculate_PM_f_sl(form, meaning, language)
+        denominator = math.fsum([self.Calculate_PM_f_sl(form, meaning, language) for language in self.language_repertoire])
 
-    def Cacluate_PC_f_stbm(self):
-        pass
+        return(1/denominator)
+
+    def Calculate_PL_l_fstbm(self, form, meaning, language, target, b_mode, monitor):
+        # Equation 8 in Ellison&Miceli 2017
+        k_L = self.Calculate_k_L(form, meaning)
+        Cardinality_L = len(self.language_repertoire)
+        PM = self.Calculate_PM_f_sl(form, meaning, language)
+        return(monitor*k_L*PM+(1-monitor)/Cardinality_L)
+
+    def Calculate_QC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
+        # Q_C(f|s;t,b,m) = P_L(l=t|f,s;t,b,m) P_G(f|s;t,b)
+        Q_C = self.Calculate_PL_l_fstbm(form, meaning, language, target, b_mode, monitor)*self.Calculate_PG_f_stb(form, meaning, target, b_mode, monitor)
+        return(Q_C)
+
+    def Calculate_PC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
+        # k = \frac{1}{\sum_f Q_c(f|s;t,b,m)}
+        k = 1/fsum([self.Calculate_QC_f_stbm(all_form, meaning, language, target, b_mode, monitor) for all_form in [language.formMeaningDict[meaning] for language in self.language_repertoire]])
+        # this should be summing the values gained from calculating Q-c_f_stbm over all forms which have the same meaning in each language in the repertoire. 
+
+        # P_C(f|s;t,b,m) = k Q_C(f|s;t,b,m)
+        P_C = k*self.Calculate_QC_f_stbm(form, meaning, language, target, b_mode, monitor)
+        return(P_C)
 
     def step(self):
         pass
