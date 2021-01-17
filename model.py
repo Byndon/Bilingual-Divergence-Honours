@@ -115,7 +115,7 @@ class Speaker_Agent(Agent):
             # determine monitoring based on others in the community
             pass
         else:
-            if(0 < monitoring and monitoring < 1):
+            if(0 <= monitoring and monitoring <= 1):
                 self.monitoring = monitoring
 
     def select_meaning(self):
@@ -172,11 +172,31 @@ class Speaker_Agent(Agent):
 
     def Calculate_P2M_f_st(self, form, meaning, language, target):
         # Equation 2 in Ellison&Miceli 2017
-        k_delta = 0
-        if language is target:
-            k_delta = 1
 
-        return(k_delta * self.Calculate_R_fs_l(form, meaning, language))
+        # for each language, determine k, multiply k and R_fs_l, add these to a list, then sum them using fsum.
+        # return this value.
+        summationList = []
+        for languages in self.languageRepertoire:
+            if languages is target:
+                k = 1
+            else:
+                k = 0
+            relativeFrequency = self.Calculate_R_fs_l(form, meaning, languages)
+            summationList.append(k * relativeFrequency)
+
+        p2M = math.fsum(summationList)
+
+        return(p2M)
+
+        # k_delta = 0
+        # if language is target:
+        #     k_delta = 1
+
+        # for languages in self.languageRepertoire:
+        #     self.Calculate_R_fs_l(form, meaning, languages)
+
+
+        # return(k_delta * self.Calculate_R_fs_l(form, meaning, language))
 
     def Calculate_PBM_f_s(self, form, meaning, language):
         # Equation 3 in Ellison&Miceli 2017
@@ -201,10 +221,7 @@ class Speaker_Agent(Agent):
         # turn this into a list comprehension and sum it's values with fsum.
         # for language in self.language_repertoire:
         #     self.Calculate_PM_f_sl(form, meaning, language)
-        denominator = math.fsum(
-            [self.Calculate_PM_f_sl(form, meaning, language)
-             for language in self.languageRepertoire])
-
+        denominator = math.fsum([self.Calculate_PM_f_sl(form, meaning, language) for language in self.languageRepertoire])
         return(1 / denominator)
 
     def Calculate_PL_l_fstbm(self, form, meaning, language, target, b_mode, monitor):
@@ -219,7 +236,7 @@ class Speaker_Agent(Agent):
         P_L = self.Calculate_PL_l_fstbm(form, meaning, language, target, b_mode, monitor)
         P_G = self.Calculate_PG_f_stb(form, meaning, target, b_mode, language)
 
-        Q_C = P_L  * P_G
+        Q_C = P_L * P_G
         return(Q_C)
 
     def Calculate_PC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
@@ -241,11 +258,8 @@ class Speaker_Agent(Agent):
         return(P_C)
 
     def step(self):
-        print("I am Agent {}, I am in community {}, and I speak {}".format(
-            self.name, self.Community.communityName, str(
-                [language.languageName for language in self.languageRepertoire])))
+
         meaning = self.select_meaning()
-        print(meaning)
         likelyhoods = []
         for language in self.languageRepertoire:
             for form in language.formMeaningDict[meaning]:
@@ -256,8 +270,19 @@ class Speaker_Agent(Agent):
                                         form, meaning, language,
                                         self.Community.communityLanguage,
                                         self.mode, self.monitoring)))
-        print(likelyhoods)
-        print((self.mode, self.monitoring))
+
+        totalOfLikelyhoods = []
+        for i in range(len(likelyhoods)):
+            totalOfLikelyhoods.append(likelyhoods[i][1])
+
+        if(math.fsum(totalOfLikelyhoods) != 1):
+            print("I am Agent {}, I am in community {}, and I speak {}".format(
+                self.name, self.Community.communityName, str(
+                    [language.languageName for language in self.languageRepertoire])))
+            print(meaning)
+            print(likelyhoods)
+            print((self.mode, self.monitoring))
+            print(math.fsum(totalOfLikelyhoods))
 
         # pick a random meaning from agent's L1.
         # calculate the relative frequency of form f.
@@ -334,16 +359,23 @@ languageList = [language1, language2, language3, language4, language5, language6
 
 # input some meanings and forms into the languages
 for eachlanguage in languageList:
-    eachlanguage.formMeaningDict = {}
+    eachlanguage.formMeaningDict.clear()
 
 language1.add_meaning("Lizard", ([("wiri-wiri", 50, 0), ("mirdi", 50, 0)]))
 language2.add_meaning("Lizard", ([("wiri-wiri", 50, 0)]))
-language3.add_meaning("Lizard", ([("wiri-wiri", 50, 0), ("mirdi", 50, 0)]))
+language3.add_meaning("Lizard", ([("wiri-wiri", 50, 0), ("mirdi", 50, 0), ("marnara", 50, 0)]))
 language4.add_meaning("Lizard", ([("julirri", 50, 0), ("jindararda", 50, 0)]))
 language5.add_meaning("Lizard", ([("jindararda", 50, 0), ("wiri-wiri", 50, 0)]))
 language6.add_meaning("Lizard", ([("mirdi", 50, 0), ("jindararda", 50, 0)]))
 
+language1.add_meaning("kangaroo", ([("yawarda", 50, 0), ("marlu", 50, 0)]))
+language2.add_meaning("kangaroo", ([("yawarda", 50, 0)]))
+language3.add_meaning("kangaroo", ([("marlu", 50, 0)]))
+language4.add_meaning("kangaroo", ([("yawarda", 50, 0)]))
+language5.add_meaning("kangaroo", ([("yawarda", 50, 0), ("marlu", 50, 0)]))
+language6.add_meaning("kangaroo", ([("marlu", 50, 0)]))
 # define the communities which
+
 community1 = Community("Com1", language1, 10)
 community2 = Community("Com2", language2, 10)
 community3 = Community("Com3", language3, 10)
@@ -365,6 +397,6 @@ socialNet.add_weighted_edges_from([
 
 
 # make the model.
-testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 1)
+testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.84)
 # step the model once.
 testingModel.step()
