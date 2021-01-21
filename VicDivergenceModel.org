@@ -69,6 +69,14 @@ In order to identify the form for t = l checking, the last character of the form
 *** Code
 #+begin_src python :tangle model.py :exports python
   class Language:
+      '''
+      A language in this model consists of a dictionary of meanings with associated forms as key values.
+      associated with the form keys are a count of the number of times it has been used
+      also associated is a count of the times it has been used in the current model step,
+      so that this can be included added at the end of the step.
+      '''
+
+      # a language has a name, a form-meaning dictionary, and a list of speakers.
       def __init__(self, languageName):
           self.languageName = languageName
           self.formMeaningDict = {}
@@ -118,24 +126,29 @@ In order to identify the form for t = l checking, the last character of the form
 *** About
 The Community class is the class which is used to group Speaker agents into communities of speakers. The Community object are then linked together on a network using networkx.
 
-
-*** code
+*** codep
 #+begin_src python :tangle model.py
-class Community:
-    def __init__(self, name, language, size=150):
-        self.communityName = name
-        self.communityMembers = []
-        self.communityLanguage = language
-        self.communitySize = size
+  class Community:
+      '''
+      A community is a grouping of speakers.
+      It consists of a name, a list of its members,
+      a 'native' community language which is spoken by the speakers,
+      and a defined number of speakers.
+      '''
+      def __init__(self, name, language, size=150):
+          self.communityName = name
+          self.communityMembers = []
+          self.communityLanguage = language
+          self.communitySize = size
 
-    def add_members(self, Speaker):
-        if(type(Speaker) is Speaker_Agent):
-            self.communityMembers.append(Speaker)
-        else:
-            print("not a speakerAgent")
+      def add_members(self, Speaker):
+          if(type(Speaker) is Speaker_Agent):
+              self.communityMembers.append(Speaker)
+          else:
+              print("not a speakerAgent")
 
-    def list_members(self):
-        print(self.communityMembers)
+      def list_members(self):
+          print(self.communityMembers)
 #+end_src
 ** Agent
 The Agent in this model represents a Speaker of a set of Languages. They have language mode and language monitoring parameters and a repertoire of languages which they can use. At Each step of the model simulation, Agents will choose a  Meaning /s/, and attempt to produce a target from /t/, based on the language they are aiming to speak in. The target language will be the language that is assigned to the community of which they are a member.
@@ -175,6 +188,13 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
 *** Code:
 #+begin_src python :tangle model.py :exports python
   class Speaker_Agent(Agent):
+      '''
+      A speaker in this model is the agent.
+      speakers belong to a community and have a repertoire of languages 
+      which they have the possibility of speaking,
+      based on the connections between their community
+      and others.
+      '''
       def __init__(self, name, model, L1, mode=False, monitoring=False):
           super().__init__(name, model)
           self.name = name
@@ -188,7 +208,8 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
           self.Community = None
 
       def language_repertoire_add(self, language):
-          self.languageRepertoire.append(language)
+          if(type(language) is Language):
+             self.languageRepertoire.append(language)
 
       def define_community(self, community):
           if(type(community) is Community):
@@ -227,120 +248,176 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
                   self.monitoring = monitoring
 
       def select_meaning(self):
-          # randint is inclusive of the begin and end numbers.
-          # select which meaning key is used from all possible meanings in one of the agent's languages.
-          # meanaings are the keys for the dictionary
-          # I use L1 just out of convenience, all languages can express the same meanings.
+          # select randomly which meaning key is used,
+          # from all possible meanings in one of the agent's languages.
+          # meanings are the keys for the dictionary
+          # I use L1 (the first language in the repertoire list)
+          # out of convenience, all languages can express the same meanings.
 
+          # make a random choice from a list of the dictionary keys.
           meaningChosen = self.random.choice(list(self.languageRepertoire[0].formMeaningDict.keys()))
 
           return(meaningChosen)
-      # below this comment, is the calculations for the bilingual mode and monitoring model. E&M 2017.
-      def Calculate_R_fs_l(self, form, meaning, language):
-          # what is the frequency of this form being associated with
-          # this meaning in this language?
 
-          # find the index of the form in the list of forms.
-          formTally = 0
+  # below this comment, is the calculations for the bilingual mode and monitoring model. E&M 2017.
+      def Calculate_N_fs_l(self, form, meaning, language):
+          # N(f,s|l) = |\{i \in 1..n_l|S_{l,i} = (f,s)\}|
+          numberOfPairings = 0
           for formTuple in language.formMeaningDict[meaning]:
               if formTuple == form:
-                  formTally = formTuple[1]
+                  numberOfPairings = formTuple[1]
                   break
 
-          # find the total number of usages of the meaning.
-          total_meaning_tally = 0
+          return(numberOfPairings)
+        
+      def Calculate_R_fs_l(self, form, meaning, language):
+          '''
+          Using f for form, s for meaning, and l to denote the language, we express the relative
+          frequency (R) with which a language learner hears a form-meaning combination, in the
+          context of language l, as R( f, s|l). In this minimal model, the probability (in monolin-
+          gual mode: P M ) of using form f on a future occasion to express meaning s in language l
+          is the ratio of the relative frequency of the combination to the marginal frequency of
+          using that meaning in that language (1).
+
+          Overall frequency of f,s pairing in l, so it has to account for all meanings and words
+          in that language.
+          '''
+          # R(F,s|l) = \frac{N(F,s|l)}{\sum_{s,l}N(f,s|l)}
+        
+          # Relative frequency with which a language learner hears a from-meaning combination,
+          # in the context of language l
+          '''
+          currently the number of form-meaning pairings is determined by
+          the use of a tally which records how many times a particular
+          form has been used by an agent in a particular language.
+          This a a quantity that can be set depending on the desired
+          relative frequency of the forms for a meaning in a language.
+          '''
+
+          # this is the numerator: N(f,s|l)
+          numberOfPairings = self.Calculate_N_fs_l(form, meaning, language)
+        
+          # double summation requires expanding the internal sigma and then computing the outer sigma.
+          summationListL = []
+          summationListS = []
+          # this is the denominator
+          # this first loop expands \sum_lN(f,s|l)
           for languages in self.languageRepertoire:
-              for formTuple in languages.formMeaningDict[meaning]:
-                  total_meaning_tally += formTuple[1]
+              # this second loop expands \sum_sN(f,s|l)
+              for meanings in languages.formMeaningDict:
+                  # the values of N(f,s|l) for each meaning s
+                  # are appended onto the list.
+                  summationListS.append(self.Calculate_N_fs_l(form, meanings, languages))
+              # the sums of the list of values from N(f,s |l) are appended
+              # to a list which sums over all s within each language
+              # in the agent's repertoire.
+              summationListL.append(math.fsum(summationListS))
+          # sum the frequencies for each language to get a total frequency
+          # of occurence for the specific form in all the agent's languages.
+          denominator = math.fsum(summationListL)
+        
+          # relativeFrequency gives frequency of f,s pair across all languages in the agent's
+          # repertoire. Hopefully.
+          relativeFrequency = numberOfPairings / denominator
 
-          # return the percentage of the form to the total usage of the meaning
-          # i.e. how frequent this form is when expressing this meaning.
-          return(formTally / total_meaning_tally)
-
+          return(relativeFrequency)
+    
       def Calculate_PM_f_sl(self, form, meaning, language):
           # Equation 1 in Ellison&Miceli 2017
+          # P_M(f|s;l) = \frac{R(f,s|l)}{\sum_f R(f,s\l)}
+          '''
+          Using f for form, s for meaning, and l to denote the language, we express the relative
+          frequency (R) with which a language learner hears a form-meaning combination, in the
+          context of language l, as R( f, s|l). In this minimal model, the probability (in monolin-
+          gual mode: P M ) of using form f on a future occasion to express meaning s in language l
+          is the ratio of the relative frequency of the combination to the marginal frequency of
+          using that meaning in that language (1).
+          '''
           # calculate the relative ferquency of the form in language for meaning
-          relative_frequency_f = self.Calculate_R_fs_l(form, meaning, language)
+          relativeFrequencyF = self.Calculate_R_fs_l(form, meaning, language)
 
-          # what I THINK This is doing:
-          # creating a list of the results from Cacluate_R_fs_l
-          # and summing the contents of the list with math.fsum()
-          # i KNOW this will be inefficient, as it is calculating the total_meaning_tally each time.
-
-          # old code, the debugger apparently doesn't play nicely with namespaces in list comprehensions.
-          # marginal_frequency = math.fsum([self.Calculate_R_fs_l(form[0], meaning, language) for form in language.formMeaningDict[meaning]])
-
-          marginal_frequency_list = []
+          # calculate the marginal frequency of using that meaning in that language.
+          marginalFrequencyList = []
           for form in language.formMeaningDict[meaning]:
-              marginal_frequency_list.append(self.Calculate_R_fs_l(form, meaning, language))
+              # calculates the frequency for each form in the language
+              marginalFrequencyList.append(self.Calculate_R_fs_l(form, meaning, language))
+          # sums the calculated values as in \sum_f R(f,s|l)
+          marginalFrequency = math.fsum(marginalFrequencyList)
 
-          marginal_frequency = math.fsum(marginal_frequency_list)
+          return(relativeFrequencyF / marginalFrequency)
 
-          return(relative_frequency_f / marginal_frequency)
-
-      def Calculate_P2M_f_st(self, form, meaning, language, target):
+      def Calculate_P2M_f_st(self, form, meaning, target):
           # Equation 2 in Ellison&Miceli 2017
+          # P_{2M}(f|s;t) = \sum_t \mathrm{\delta}_{l}^{t}P_M(f|s;l)
 
-          # for each language, determine k, multiply k and R_fs_l, add these to a list, then sum them using fsum.
+          # for each language, determine k, multiply k by PM_f_sl, add these to a list, then sum them using fsum.
           # return this value.
+
+          # Summing over languages,, rather than targets here.
+          # Instead of checking if each language is the given target,
+          # should it instead be checking if each possible target is the given language?
+          # Unsure if this makes a difference, as if t != l then the product of k
+          # and P_M(f,s|l) is 0 anyway. 
           summationList = []
-          for languages in self.languageRepertoire:
-              if languages is target:
-                  k = 1
+          kroeneckerDelta = 0
+          for language in self.languageRepertoire:
+              if language is target:
+                  kroeneckerDelta = 1
               else:
-                  k = 0
-              relativeFrequency = self.Calculate_R_fs_l(form, meaning, languages)
-              summationList.append(k * relativeFrequency)
+                  kroeneckerDelta = 0
+            
+              relativeFrequency = self.Calculate_PM_f_sl(form, meaning, language)
+              summationList.append(kroeneckerDelta * relativeFrequency)
 
           p2M = math.fsum(summationList)
 
           return(p2M)
 
-          # k_delta = 0
-          # if language is target:
-          #     k_delta = 1
-
-          # for languages in self.languageRepertoire:
-          #     self.Calculate_R_fs_l(form, meaning, languages)
-
-
-          # return(k_delta * self.Calculate_R_fs_l(form, meaning, language))
-
       def Calculate_PBM_f_s(self, form, meaning, language):
           # Equation 3 in Ellison&Miceli 2017
+          # P_{BM}(f|s) = \sum_{l \in L}\frac{1}{|L|}P_M(f|s;l)
+
+          # Don't know the scope of the sum here, may be doing something wrong.
           L = len(self.languageRepertoire)
 
-          PBM = 0
+          summationList = []  # declare a list to sum over.
           for language in self.languageRepertoire:
-              PM = self.Calculate_PM_f_sl(form, meaning, language)
-              PBM += 1 / L * PM
-
+              # calculate PM for each language
+              PM = self.Calculate_PM_f_sl(form, meaning, language)  
+              summationList.append(1 / L * PM)  # add product of 1/L and PM to list for summation.
+            
+          PBM = math.fsum(summationList)  # sum list.
           return(PBM)
 
       def Calculate_PG_f_stb(self, form, meaning, target, b_mode, language):
           # Equation 4 in Ellison&Miceli 2017
-          P2M = self.Calculate_P2M_f_st(form, meaning, language, target)
-          PBM = self.Calculate_PBM_f_s(form, meaning, language)
+          # P_G(f|s;t,b) = (1-b)P_{2M}(f|s;t)+bP_{BM}(f|s)
+        
+          P2M = self.Calculate_P2M_f_st(form, meaning, target)  # calculate 2M model
+          PBM = self.Calculate_PBM_f_s(form, meaning, language)  # calcuclate BM model.
 
-          return((1 - b_mode) * P2M + b_mode * PBM)
+          return((1 - b_mode) * P2M + b_mode * PBM)  # calcualte PG
 
       def Calculate_k_L(self, form, meaning):
-          # k_L = \frac{1}{\sum_{l \in L} P_M(f|s;l)}
-          # turn this into a list comprehension and sum it's values with fsum.
-          # for language in self.language_repertoire:
-          #     self.Calculate_PM_f_sl(form, meaning, language)
+          # k_L(f,s,t,p_G) = k_L(f,s) = \frac{1}{\sum_{l} P_M(f|s;l)}
+
+          # for each language in agent's repertoire, calculate PM
           denominator = math.fsum([self.Calculate_PM_f_sl(form, meaning, language) for language in self.languageRepertoire])
+          # 1 / PM = k_L
           return(1 / denominator)
 
       def Calculate_PL_l_fstbm(self, form, meaning, language, target, b_mode, monitor):
           # Equation 8 in Ellison&Miceli 2017
+          # P_L(l|f,s;t,p_G,m) = mk_LP_M(f|s;l)+\frac{1-m}{|L|}
+        
           k_L = self.Calculate_k_L(form, meaning)
-          Cardinality_L = len(self.languageRepertoire)
+          CardinalityOfL = len(self.languageRepertoire)
           PM = self.Calculate_PM_f_sl(form, meaning, language)
-          return(monitor * k_L * PM + (1 - monitor) / Cardinality_L)
+          return(monitor * k_L * PM + (1 - monitor) / CardinalityOfL)
 
       def Calculate_QC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
           # Q_C(f|s;t,b,m) = P_L(l=t|f,s;t,b,m) P_G(f|s;t,b)
+        
           P_L = self.Calculate_PL_l_fstbm(form, meaning, language, target, b_mode, monitor)
           P_G = self.Calculate_PG_f_stb(form, meaning, target, b_mode, language)
 
@@ -348,53 +425,54 @@ If this is all good with Luisa and Mark, then great! If not I'll have to ask for
           return(Q_C)
 
       def Calculate_PC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
-          # k = \frac{1}{\sum_f Q_c(f|s;t,b,m)}
+          # k_c(s;t,b,m) = \frac{1}{\sum_f Q_c(f|s;t,b,m)}
 
-          # old code, a  bit spaghetti
-          # k = 1 / math.fsum([self.Calculate_QC_f_stbm(all_form, meaning, language, target, b_mode, monitor) for all_form in [language.formMeaningDict[meaning] for language in self.language_repertoire]])
-          QC_f_stbm_list = []
-          for language in self.languageRepertoire:
-              for all_forms in language.formMeaningDict[meaning]:
-                  QC_f_stbm_list.append(self.Calculate_QC_f_stbm(
-                      all_forms, meaning, language, target, b_mode, monitor))
-
-          k = 1 / math.fsum(QC_f_stbm_list)
-          # this should be summing the values gained from calculating Q-c_f_stbm over all forms which have the same meaning in each language in the repertoire. 
+          summationList = []
+          for forms in target.formMeaningDict[meaning]:
+              summationList.append(self.Calculate_QC_f_stbm(forms, meaning, language, target, b_mode, monitor))
+          k_C = 1 / math.fsum(summationList)
 
           # P_C(f|s;t,b,m) = k Q_C(f|s;t,b,m)
-          P_C = k * self.Calculate_QC_f_stbm(form, meaning, language, target, b_mode, monitor)
+          P_C = k_C * self.Calculate_QC_f_stbm(form, meaning, language, target, b_mode, monitor)
           return(P_C)
 
       def step(self):
 
+          #select a meaning to be produced at random. This is the target meaning.
           meaning = self.select_meaning()
+
+          # a list to hold tuples containing the form, likelyhood of production,
+          # and the language to which it belongs.
           likelyhoods = []
+        
+          # for every language in the agent's repertoire,
+          # calculate the likelyhood of producing a form f
+          # for the meaning s in that language.
           for language in self.languageRepertoire:
               for form in language.formMeaningDict[meaning]:
-                  # the code in the next line just prints the results
-                  # print((form, self.Calculate_PC_f_stbm(form, meaning, language, self.community.communityLanguage, self.mode, self.monitoring)))
                   likelyhoods.append((form,
                                       self.Calculate_PC_f_stbm(
                                           form, meaning, language,
                                           self.Community.communityLanguage,
-                                          self.mode, self.monitoring)))
+                                          self.mode, self.monitoring),
+                                      language.languageName))
 
-          totalOfLikelyhoods = []
-          for i in range(len(likelyhoods)):
-              totalOfLikelyhoods.append(likelyhoods[i][1])
-
-          if(math.fsum(totalOfLikelyhoods) != 1):
-              print("I am Agent {}, I am in community {}, and I speak {}".format(
-                  self.name, self.Community.communityName, str(
-                      [language.languageName for language in self.languageRepertoire])))
-              print(meaning)
-              print(likelyhoods)
-              print((self.mode, self.monitoring))
-              print(math.fsum(totalOfLikelyhoods))
-
-          # pick a random meaning from agent's L1.
-          # calculate the relative frequency of form f.
-          # expressed_meaning = self.select_meaning()
+              # a list to hold the likelyhood calculations to check they sum to 1
+              totalOfLikelyhoods = []
+              for i in range(len(likelyhoods)):
+                  # take the likelyhood calulated for each for from the tuple for summation.
+                  totalOfLikelyhoods.append(likelyhoods[i][1])
+                  # the total of the likelyhoods should sum to 1, I believe
+                  # it currently does not.
+                
+          # have some output.
+          print("I am Agent {}, I am in community {}, and I speak {}".format(
+              self.name, self.Community.communityName, str(
+                  [language.languageName for language in self.languageRepertoire])))
+          print(meaning)
+          print(likelyhoods)
+          # the following is mostly not 1 as it should be
+          print(math.fsum(totalOfLikelyhoods))
 #+end_src
 
 ** Model
@@ -467,6 +545,7 @@ This should proably be done in another file, but for now this will do.
   # from model import Community
   # import networkx as nx
 
+  # ensure the languages exist.
   language1 = Language("Language1")
   language2 = Language("Language2")
   language3 = Language("Language3")
@@ -479,8 +558,10 @@ This should proably be done in another file, but for now this will do.
 
   # input some meanings and forms into the languages
   for eachlanguage in languageList:
+      # clear the dict to ensure the "vocabulary" is empty.
       eachlanguage.formMeaningDict.clear()
-
+  # for testing I include 2 meanings. All are 50-50 frequencies for ease,
+  # and there are some doppels.
   language1.add_meaning("Lizard", ([("wiri-wiri", 50, 0), ("mirdi", 50, 0)]))
   language2.add_meaning("Lizard", ([("wiri-wiri", 50, 0)]))
   language3.add_meaning("Lizard", ([("wiri-wiri", 50, 0), ("mirdi", 50, 0), ("marnara", 50, 0)]))
@@ -494,8 +575,9 @@ This should proably be done in another file, but for now this will do.
   language4.add_meaning("kangaroo", ([("yawarda", 50, 0)]))
   language5.add_meaning("kangaroo", ([("yawarda", 50, 0), ("marlu", 50, 0)]))
   language6.add_meaning("kangaroo", ([("marlu", 50, 0)]))
-  # define the communities which
 
+  # define the communities to which agent's can belong.
+  # this determines which language they speak natively.
   community1 = Community("Com1", language1, 10)
   community2 = Community("Com2", language2, 10)
   community3 = Community("Com3", language3, 10)
@@ -519,8 +601,10 @@ This should proably be done in another file, but for now this will do.
   # make the model.
   testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.84)
   # step the model once.
+  # can be put in a loop to run many times.
+  # determining number of loops and other parameters will be done by the runner script
+  # when it is developed.
   testingModel.step()
-
 #+end_src
 
 #+RESULTS:
