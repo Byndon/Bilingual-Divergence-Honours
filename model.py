@@ -31,7 +31,7 @@ class Language:
     def add_meaning(self, meaning, formTupleList):
         if(type(formTupleList) is list and all(
                 [True for t in formTupleList if type(t) is tuple])):
-            # check if the formTupleList given is a list, and that the list contains tuples. 
+            # check if the formTupleList given is a list, and that the list contains tuples.
             self.formMeaningDict[meaning] = formTupleList
             return(True)
         else:
@@ -83,7 +83,7 @@ class Community:
 class Speaker_Agent(Agent):
     '''
     A speaker in this model is the agent.
-    speakers belong to a community and have a repertoire of languages 
+    speakers belong to a community and have a repertoire of languages
     which they have the possibility of speaking,
     based on the connections between their community
     and others.
@@ -102,7 +102,7 @@ class Speaker_Agent(Agent):
 
     def language_repertoire_add(self, language):
         if(type(language) is Language):
-           self.languageRepertoire.append(language)
+            self.languageRepertoire.append(language)
 
     def define_community(self, community):
         if(type(community) is Community):
@@ -152,7 +152,7 @@ class Speaker_Agent(Agent):
 
         return(meaningChosen)
 
-# below this comment, is the calculations for the bilingual mode and monitoring model. E&M 2017.
+    # below this comment, is the calculations for the bilingual mode and monitoring model. E&M 2017.
     def Calculate_N_fs_l(self, form, meaning, language):
         # N(f,s|l) = |\{i \in 1..n_l|S_{l,i} = (f,s)\}|
         numberOfPairings = 0
@@ -171,7 +171,6 @@ class Speaker_Agent(Agent):
         gual mode: P M ) of using form f on a future occasion to express meaning s in language l
         is the ratio of the relative frequency of the combination to the marginal frequency of
         using that meaning in that language (1).
-
         Overall frequency of f,s pairing in l, so it has to account for all meanings and words
         in that language.
         '''
@@ -250,7 +249,7 @@ class Speaker_Agent(Agent):
         # Instead of checking if each language is the given target,
         # should it instead be checking if each possible target is the given language?
         # Unsure if this makes a difference, as if t != l then the product of k
-        # and P_M(f,s|l) is 0 anyway. 
+        # and P_M(f,s|l) is 0 anyway.
         summationList = []
         kroeneckerDelta = 0
         for language in self.languageRepertoire:
@@ -330,7 +329,7 @@ class Speaker_Agent(Agent):
         return(P_C)
 
     def step(self):
-
+        print("step start:")
         #select a meaning to be produced at random. This is the target meaning.
         meaning = self.select_meaning()
 
@@ -366,6 +365,7 @@ class Speaker_Agent(Agent):
         print(likelyhoods)
         # the following is mostly not 1 as it should be
         print(math.fsum(totalOfLikelyhoods))
+        print("step end\n")
 
 class DivergenceModel(Model):
     def __init__(self, languageObjectList, communityObjectList, network, mode=False, monitoring=False, seed=12345):
