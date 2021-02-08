@@ -189,7 +189,7 @@ class Speaker_Agent(Agent):
         Overall frequency of f,s pairing in l, so it has to account for all meanings and words
         in that language.
         '''
-        # R(F,s|l) = \frac{N(F,s|l)}{\sum_{s,l}N(f,s|l)}
+        # R(F,s|l) = \frac{N(F,s|l)}{\sum_{s,f}N(f,s|l)}
 
         # Relative frequency with which a language learner hears a from-meaning combination,
         # in the context of language l
@@ -205,23 +205,30 @@ class Speaker_Agent(Agent):
         numberOfPairings = self.Calculate_N_fs_l(form, meaning, language)
 
         # double summation requires expanding the internal sigma and then computing the outer sigma.
-        summationListL = []
+        summationListF = []
         summationListS = []
         # this is the denominator
         # this first loop expands \sum_lN(f,s|l)
-        for languages in self.languageRepertoire:
-            # this second loop expands \sum_sN(f,s|l)
-            for meanings in languages.formMeaningDict:
-                # the values of N(f,s|l) for each meaning s
-                # are appended onto the list.
-                summationListS.append(self.Calculate_N_fs_l(form, meanings, languages))
-            # the sums of the list of values from N(f,s |l) are appended
-            # to a list which sums over all s within each language
-            # in the agent's repertoire.
-            summationListL.append(math.fsum(summationListS))
+        # for languages in self.languageRepertoire:
+        #     # this second loop expands \sum_sN(f,s|l)
+        #     for meanings in languages.formMeaningDict:
+        #         # the values of N(f,s|l) for each meaning s
+        #         # are appended onto the list.
+        #         summationListS.append(self.Calculate_N_fs_l(form, meanings, languages))
+        #     # the sums of the list of values from N(f,s |l) are appended
+        #     # to a list which sums over all s within each language
+        #     # in the agent's repertoire.
+        #     summationListL.append(math.fsum(summationListS))
+
+        for meanings in language.formMeaningDict:
+            for forms in language.formMeaningDict[meanings]:
+                summationListF.append(self.Calculate_N_fs_l(forms, meanings, language))
+            summationListS.append(math.fsum(summationListF))
+                                      
+                
         # sum the frequencies for each language to get a total frequency
         # of occurence for the specific form in all the agent's languages.
-        denominator = math.fsum(summationListL)
+        denominator = math.fsum(summationListS)
 
         # relativeFrequency gives frequency of f,s pair across all languages in the agent's
         # repertoire. Hopefully.
@@ -319,7 +326,7 @@ class Speaker_Agent(Agent):
 
         k_L = self.Calculate_k_L(form, meaning)
         CardinalityOfL = len(self.languageRepertoire)
-        PM = self.Calculate_PM_f_sl(form, meaning, language)
+        PM = self.Calculate_PM_f_sl(form, meaning, target)# pass target instead of language. No need for language argument. 
         return(monitor * k_L * PM + (1 - monitor) / CardinalityOfL)
 
     def Calculate_QC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
