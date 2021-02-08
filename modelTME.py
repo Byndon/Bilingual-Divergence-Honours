@@ -31,7 +31,7 @@ class Language:
     def add_meaning(self, meaning, formTupleList):
         if(type(formTupleList) is list and all(
                 [True for t in formTupleList if type(t) is tuple])):
-            # check if the formTupleList given is a list, and that the list contains tuples. 
+            # check if the formTupleList given is a list, and that the list contains tuples.
             self.formMeaningDict[meaning] = formTupleList
             return(True)
         else:
@@ -83,10 +83,23 @@ class Community:
 class Speaker_Agent(Agent):
     '''
     A speaker in this model is the agent.
-    speakers belong to a community and have a repertoire of languages 
+    speakers belong to a community and have a repertoire of languages
     which they have the possibility of speaking,
     based on the connections between their community
     and others.
+    '''
+
+    '''
+    Current Issues:
+    - Doppels can be > 50% chance. Anti-doppel bias should not allow this (?)
+    -- e.g. speakers of language 4 and 6 will have the doppel "Marlu" as a certainty.
+    -- i.e. probability = 1.0
+
+    - currently, language target combinations where there is no exact match between the
+    -- language forms and the forms present in the target language.
+    -- i.e if target has 2 forms jindararda and wiri-wiri, but the loop has got to the form
+    -- mirdi, which is also in the agent's repertoire, it often calculates probabilities > 1.0
+    -- likley due to how I am looping through the forms, languages, and targets.
     '''
     def __init__(self, name, model, L1, mode=False, monitoring=False):
         super().__init__(name, model)
@@ -102,7 +115,7 @@ class Speaker_Agent(Agent):
 
     def language_repertoire_add(self, language):
         if(type(language) is Language):
-           self.languageRepertoire.append(language)
+            self.languageRepertoire.append(language)
 
     def define_community(self, community):
         if(type(community) is Community):
@@ -152,13 +165,15 @@ class Speaker_Agent(Agent):
 
         return(meaningChosen)
 
-# below this comment, is the calculations for the bilingual mode and monitoring model. E&M 2017.
+    # below this comment, is the calculations for the bilingual mode and monitoring model. E&M 2017.
     def Calculate_N_fs_l(self, form, meaning, language):
         # N(f,s|l) = |\{i \in 1..n_l|S_{l,i} = (f,s)\}|
         numberOfPairings = 0
-        for formTuple in language.formMeaningDict[meaning]:
-            if formTuple == form:
-                numberOfPairings = formTuple[1]
+        for formString in language.formMeaningDict[meaning]:
+            if(formString[0] == form[0]):
+                numberOfPairings = formString[1]
+                # there shouldn't be any occurences of more
+                # than 1 of the same form for a particular meaning.
                 break
 
         return(numberOfPairings)
@@ -249,7 +264,7 @@ class Speaker_Agent(Agent):
         # Instead of checking if each language is the given target,
         # should it instead be checking if each possible target is the given language?
         # Unsure if this makes a difference, as if t != l then the product of k
-        # and P_M(f,s|l) is 0 anyway. 
+        # and P_M(f,s|l) is 0 anyway.
         summationList = []
         kroeneckerDelta = 0
         for language in self.languageRepertoire:
@@ -320,40 +335,71 @@ class Speaker_Agent(Agent):
         # k_c(s;t,b,m) = \frac{1}{\sum_f Q_c(f|s;t,b,m)}
 
         summationList = []
-        print("  target.formMeaningDict "," ".join(map(lambda x: str(x[0]),target.formMeaningDict[meaning]))," = P(%s|%s,%s)" % (form,meaning,language.languageName))
+        print("Calculate_PC_f_stbm:")
+        print("  target.formMeaningDict:", " ".join(map(
+            lambda x: str(x[0]), target.formMeaningDict[meaning])), " = P(%s|%s,%s)" % (
+                form, meaning, language.languageName))
+        # lambda x: str(x[0]) takes the 0th item in the list x and converts it to a string.
         for forms in target.formMeaningDict[meaning]:
             x = self.Calculate_QC_f_stbm(forms, meaning, language, target, b_mode, monitor)
             summationList.append(x)
-        k_C = 1 / math.fsum(summationList)
+        k_C = 1.0 / math.fsum(summationList)
 
         # P_C(f|s;t,b,m) = k Q_C(f|s;t,b,m)
-        ### TME: When I print out all the forms (above) for a given meaning, I get a list which sometimes does not include
-        ###      the value of "form", e.g. the list is "julirri jindararda" and the value of form is "wiri-wiri"
-        ###      Agent 31, Language6
-        ###      As a result, k_C will be less than the sum of the values including P(wiri-wiri|..)
+        # TME: When I print out all the forms (above) for a given meaning, I get a list which sometimes does not include
+        #      the value of "form", e.g. the list is "julirri jindararda" and the value of form is "wiri-wiri"
+        #      Agent 31, Language6
+        #      As a result, k_C will be less than the sum of the values including P(wiri-wiri|..)
+
+        ''' 
+        CB:
+        This is because the code loops through each and every word that it has for
+        the specific meaning in it's repertoire.  So if the target has 2 or more languages
+        available to it, it will check the probability of producing each form from all its
+        languages in each of its languages.
+
+        so if in language4 it has Julirri and Jindararda as the possible forms, but also
+        can speak language2, with Wiri-wiri as the form (a weighting of 0.4 currently)
+        it will check all 3 forms in both languages, thus giving the above result.
+
+        Could be due to the use of the target formMeaningDict, as this only looks at the
+        formMeaningDict of the target, if the target language doesn't have all the forms
+        from the language for which the probabilities are being calculated, it can
+        only print the form present in the target language.
+        '''
+        print("k_C: ", k_C)
         print("  PC_f_stbm:", 1.0 / k_C, meaning, language.languageName, target.languageName)
+        # CB: do we want to print 1.0/k_C here? 1/k_C is the inverse of the variable k_C.
+        # so if k_C was 25, 1/k_C would be 0.04.
+        # what is the range of values of k_C
         P_C = k_C * self.Calculate_QC_f_stbm(form, meaning, language, target, b_mode, monitor)
         return(P_C)
 
     def step(self):
-
-        #select a meaning to be produced at random. This is the target meaning.
+        print("\n\tSTEP START:\n")
+        # select a meaning to be produced at random. This is the target meaning.
         meaning = self.select_meaning()
 
+        print("I am Agent {}, I am in community {}, and I speak {}".format(
+            self.name, self.Community.communityName, str(
+                [language.languageName for language in self.languageRepertoire])))
         # a list to hold tuples containing the form, likelyhood of production,
         # and the language to which it belongs.
+        print("meaning: ", meaning, "\n")
         likelyhoods = []
 
         # for every language in the agent's repertoire,
         # calculate the likelyhood of producing a form f
         # for the meaning s in that language.
+        # calculates probability of every form for the intended meaning
+        # across the entire repertoire of langauges.
         for language in self.languageRepertoire:
             for form in language.formMeaningDict[meaning]:
                 p = self.Calculate_PC_f_stbm(
-                                        form, meaning, language,
-                                        self.Community.communityLanguage,
-                                        self.mode, self.monitoring)
-                print("  PC_f_stbm",form,p,language.languageName)
+                    form, meaning, language,
+                    self.Community.communityLanguage,
+                    self.mode, self.monitoring)
+                print("  PC_f_stbm", form, p, language.languageName)
                 likelyhoods.append((form,
                                     p,
                                     language.languageName))
@@ -363,22 +409,25 @@ class Speaker_Agent(Agent):
             ###      that have been looked at so far, in the following for-loop
             ###      The total of likelihoods needs to add up to 1.0 for each language
             ###      It still doesn't do that, but this difficulty makes it worse
+
+            '''
+            CB:
+            Fixed summing over all languages, by adding the summing into the loop
+            for each language. The probability is 1.0 if the Agent speaks only 1
+            language and that language has only 1 form.
+
+            Probability runs into problems when ***
+            '''
             totalOfLikelyhoods = []
             for i in range(len(likelyhoods)):
                 # take the likelyhood calulated for each for from the tuple for summation.
                 totalOfLikelyhoods.append(likelyhoods[i][1])
                 # the total of the likelyhoods should sum to 1, I believe
                 # it currently does not.
-            print(language.languageName,math.fsum(totalOfLikelyhoods))
-
-        # have some output.
-        print("I am Agent {}, I am in community {}, and I speak {}".format(
-            self.name, self.Community.communityName, str(
-                [language.languageName for language in self.languageRepertoire])))
-        print(meaning)
-        print(likelyhoods)
-        # the following is mostly not 1 as it should be
-        print(math.fsum(totalOfLikelyhoods))
+            print("\n", language.languageName, totalOfLikelyhoods)
+            print("\n", math.fsum(totalOfLikelyhoods))
+        print("likelyhoods: ", likelyhoods)
+        print("\n\tSTEP END\n")
 
 class DivergenceModel(Model):
     def __init__(self, languageObjectList, communityObjectList, network, mode=False, monitoring=False, seed=12345):
