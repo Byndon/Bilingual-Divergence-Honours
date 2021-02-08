@@ -353,19 +353,23 @@ class Speaker_Agent(Agent):
 
         ''' 
         CB:
-        This is because the code loops through each and every word that it has for
-        the specific meaning in it's repertoire.  So if the target has 2 or more languages
-        available to it, it will check the probability of producing each form from all its
-        languages in each of its languages.
+        So the code in step() loops through each language in the agent's repertoire.
+        Within this loop it loops through each form which exists
+        for that meaning in the current language.
 
-        so if in language4 it has Julirri and Jindararda as the possible forms, but also
-        can speak language2, with Wiri-wiri as the form (a weighting of 0.4 currently)
-        it will check all 3 forms in both languages, thus giving the above result.
+        This is for the purpose of getting a bunch of probabilities of how likely the agent
+        is to produce any form, from any language for the given meaning.
 
-        Could be due to the use of the target formMeaningDict, as this only looks at the
-        formMeaningDict of the target, if the target language doesn't have all the forms
-        from the language for which the probabilities are being calculated, it can
-        only print the form present in the target language.
+        So, the forms in the target dictionary do not always correspond to the current form
+        for which the probability of use (given the intended meaning) is being calculated.
+
+        This means we could be calculating the probability of producing the (1) form wiri-wiri,
+        from language4, given that the target language is language6,
+        which has 2 forms: Julirri and Jindararda.
+
+        This isthe agent asking: what is the probability that I produce a word from a language
+        which is not my target language? This should be a relatively low probability.
+        
         '''
         print("k_C: ", k_C)
         print("  PC_f_stbm:", 1.0 / k_C, meaning, language.languageName, target.languageName)
@@ -386,23 +390,23 @@ class Speaker_Agent(Agent):
         # a list to hold tuples containing the form, likelyhood of production,
         # and the language to which it belongs.
         print("meaning: ", meaning, "\n")
-        likelyhoods = []
 
+        intraLanguageLikelyhoods = []
         # for every language in the agent's repertoire,
         # calculate the likelyhood of producing a form f
         # for the meaning s in that language.
         # calculates probability of every form for the intended meaning
         # across the entire repertoire of langauges.
         for language in self.languageRepertoire:
+            intraLanguageLikelyhoods.clear()
             for form in language.formMeaningDict[meaning]:
                 p = self.Calculate_PC_f_stbm(
                     form, meaning, language,
                     self.Community.communityLanguage,
                     self.mode, self.monitoring)
                 print("  PC_f_stbm", form, p, language.languageName)
-                likelyhoods.append((form,
-                                    p,
-                                    language.languageName))
+                intraLanguageLikelyhoods.append((
+                    form, p, language.languageName))
 
             # a list to hold the likelyhood calculations to check they sum to 1
             ### TME: Problem 1, you are suming up the likelihoods across all languages
@@ -415,18 +419,19 @@ class Speaker_Agent(Agent):
             Fixed summing over all languages, by adding the summing into the loop
             for each language. The probability is 1.0 if the Agent speaks only 1
             language and that language has only 1 form.
-
-            Probability runs into problems when ***
+            Also 1 where l = t has 1 form, even with doppels where l != t
+            (doppels where l != t are also given probability 1.0)
             '''
             totalOfLikelyhoods = []
-            for i in range(len(likelyhoods)):
+            for i in range(len(intraLanguageLikelyhoods)):
                 # take the likelyhood calulated for each for from the tuple for summation.
-                totalOfLikelyhoods.append(likelyhoods[i][1])
+                totalOfLikelyhoods.append(intraLanguageLikelyhoods[i][1])
                 # the total of the likelyhoods should sum to 1, I believe
                 # it currently does not.
-            print("\n", language.languageName, totalOfLikelyhoods)
-            print("\n", math.fsum(totalOfLikelyhoods))
-        print("likelyhoods: ", likelyhoods)
+            print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
+                  math.fsum(totalOfLikelyhoods))
+
+        print("likelyhoods: ", intraLanguageLikelyhoods)
         print("\n\tSTEP END\n")
 
 class DivergenceModel(Model):
