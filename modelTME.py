@@ -44,19 +44,49 @@ class Language:
             return(True)
         else:
             return(False)
-
-    def borrow_form(self):
+        
+    def calc_form_frequency(self, form, meaning):
+        totalTally = 0
+        formTally = form[1]
+        for forms in self.formMeaningDict[meaning]:
+            totalTally += forms[1]
+        frequency = formTally / totalTally
+        return(frequency)
+            
+    def borrow_form(self, meaning):
         # this function is for the chance for a language to gain a borrowing.
         # Borrowings should be marked accordingly with an addition to the
         # string indicating where they were brrowed from.
-        pass
+        bilinguals = [speaker for speaker in self.speakers if len(speaker.languageRepertoire) > 1]
+        speaker = self.random.choice(bilinguals)
 
-    def lose_form(self):
+        languageBorrowedFrom = self.random.choice(speaker.languageRepertoire)
+        if(languageBorrowedFrom is not self):
+            borrowedForm = self.random.choice(languageBorrowedFrom.formMeaningDict[meaning])
+        elif(languageBorrowedFrom is self):
+            self.borrow_form(meaning)
+        else:
+            borrowedForm = (None, 0, 0, languageBorrowedFrom)
+            print("something has gone wrong when borrowing a form."
+
+        self.formMeaningDict[meaning].append(borrowedForm)
+
+    def lose_form(self, lossLimit):
         # this function is for the chance that a form becomes so obscure that
         # it is no longer used in the language.
         # This can also occur randomly to kick-start the bias process.
         # need to figure out the randomness before implementing.
-        pass
+        for meaning in self.formMeaningDict:
+            for form in self.formMeaningDict[meaning]:
+                formFrequency = self.calc_form_frequency(form, meaning)
+                if(formFrequency < lossLimit):
+                    # find the tuple that is "form" and delete it from the
+                    # value list for the key "meaning".
+                    oldList = self.formMeaningDict[meaning]
+                    newList = oldList.remove(form)
+                    self.formMeaningDict[meaning] = newList
+                    if(len(newList) == 0):  # i.e. no more forms for a meaning
+                        self.borrow_form(meaning)
 
 class Community:
     '''
@@ -320,7 +350,7 @@ class Speaker_Agent(Agent):
         # 1 / PM = k_L
         return(1 / denominator)
 
-    def Calculate_PL_l_fstbm(self, form, meaning, language, target, b_mode, monitor):
+    def Calculate_PL_l_fstbm(self, form, meaning, target, b_mode, monitor):
         # Equation 8 in Ellison&Miceli 2017
         # P_L(l|f,s;t,p_G,m) = mk_LP_M(f|s;l)+\frac{1-m}{|L|}
 
@@ -332,7 +362,7 @@ class Speaker_Agent(Agent):
     def Calculate_QC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
         # Q_C(f|s;t,b,m) = P_L(l=t|f,s;t,b,m) P_G(f|s;t,b)
 
-        P_L = self.Calculate_PL_l_fstbm(form, meaning, language, target, b_mode, monitor)
+        P_L = self.Calculate_PL_l_fstbm(form, meaning, target, b_mode, monitor)
         P_G = self.Calculate_PG_f_stb(form, meaning, target, b_mode, language)
 
         Q_C = P_L * P_G
@@ -384,6 +414,12 @@ class Speaker_Agent(Agent):
         # so if k_C was 25, 1/k_C would be 0.04.
         # what is the range of values of k_C
         P_C = k_C * self.Calculate_QC_f_stbm(form, meaning, language, target, b_mode, monitor)
+
+        # check for rounding error 0.99 recurring.
+        x = 10 * P_C
+        y = 9 * P_C
+        if(x - y == 1.0):
+            P_C = 1.0
         return(P_C)
 
     def step(self):
@@ -413,7 +449,7 @@ class Speaker_Agent(Agent):
                     self.mode, self.monitoring)
                 print("  PC_f_stbm", form, p, language.languageName)
                 intraLanguageLikelyhoods.append((
-                    form, p, language.languageName))
+                    form, p))
 
             # a list to hold the likelyhood calculations to check they sum to 1
             ### TME: Problem 1, you are suming up the likelihoods across all languages
@@ -435,10 +471,16 @@ class Speaker_Agent(Agent):
                 totalOfLikelyhoods.append(intraLanguageLikelyhoods[i][1])
                 # the total of the likelyhoods should sum to 1, I believe
                 # it currently does not.
-            print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
-                  math.fsum(totalOfLikelyhoods))
+            sumOfTotals = math.fsum(totalOfLikelyhoods)    
+            x = 10 * sumOfTotals
+            y = 9 * sumOfTotals
+            if(x - y == 1.0):
+                sumOfTotals = 1.0
 
-        print("likelyhoods: ", intraLanguageLikelyhoods)
+            print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
+                  sumOfTotals)
+
+        print("likelyhoods: ", intraLanguageLikelyhoods[:][:][:-1])
         print("\n\tSTEP END\n")
 
 class DivergenceModel(Model):
@@ -517,19 +559,19 @@ for eachlanguage in languageList:
     eachlanguage.formMeaningDict.clear()
 # for testing I include 2 meanings. All are 50-50 frequencies for ease,
 # and there are some doppels.
-language1.add_meaning("Lizard", ([("wiri-wiri", 50, 0), ("mirdi", 50, 0)]))
-language2.add_meaning("Lizard", ([("wiri-wiri", 50, 0)]))
-language3.add_meaning("Lizard", ([("wiri-wiri", 50, 0), ("mirdi", 50, 0), ("marnara", 50, 0)]))
-language4.add_meaning("Lizard", ([("julirri", 50, 0), ("jindararda", 50, 0)]))
-language5.add_meaning("Lizard", ([("jindararda", 50, 0), ("wiri-wiri", 50, 0)]))
-language6.add_meaning("Lizard", ([("mirdi", 50, 0), ("jindararda", 50, 0)]))
+language1.add_meaning("Lizard", [("wiri-wiri", 50, 0, language1), ("mirdi", 50, 0, language1)])
+language2.add_meaning("Lizard", [("wiri-wiri", 50, 0, language2)])
+language3.add_meaning("Lizard", [("wiri-wiri", 50, 0, language3), ("mirdi", 50, 0, language3), ("marnara", 50, 0, language3)])
+language4.add_meaning("Lizard", [("julirri", 50, 0, language4), ("jindararda", 50, 0, language4)])
+language5.add_meaning("Lizard", [("jindararda", 50, 0, language5), ("wiri-wiri", 50, 0, language5)])
+language6.add_meaning("Lizard", [("mirdi", 50, 0, language6), ("jindararda", 50, 0, language6)])
 
-language1.add_meaning("kangaroo", ([("yawarda", 50, 0), ("marlu", 50, 0)]))
-language2.add_meaning("kangaroo", ([("yawarda", 50, 0)]))
-language3.add_meaning("kangaroo", ([("marlu", 50, 0)]))
-language4.add_meaning("kangaroo", ([("yawarda", 50, 0)]))
-language5.add_meaning("kangaroo", ([("yawarda", 50, 0), ("marlu", 50, 0)]))
-language6.add_meaning("kangaroo", ([("marlu", 50, 0)]))
+language1.add_meaning("kangaroo", [("yawarda", 50, 0, language1), ("marlu", 50, 0, language1)])
+language2.add_meaning("kangaroo", [("yawarda", 50, 0, language2)])
+language3.add_meaning("kangaroo", [("marlu", 50, 0, language3)])
+language4.add_meaning("kangaroo", [("yawarda", 50, 0, language4)])
+language5.add_meaning("kangaroo", [("yawarda", 50, 0, language5), ("marlu", 50, 0, language5)])
+language6.add_meaning("kangaroo", [("marlu", 50, 0, language6)])
 
 # define the communities to which agent's can belong.
 # this determines which language they speak natively.
