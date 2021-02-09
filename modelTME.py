@@ -54,24 +54,38 @@ class Language:
         return(frequency)
             
     def borrow_form(self, meaning):
+        # this has not been tested!
         # this function is for the chance for a language to gain a borrowing.
         # Borrowings should be marked accordingly with an addition to the
         # string indicating where they were brrowed from.
+
+        # make a list of bilingual speakers, so that i don't choose something which will cause
+        # an endless loop of this function calling itself.
         bilinguals = [speaker for speaker in self.speakers if len(speaker.languageRepertoire) > 1]
+
+        # select a random bilingual. The selection biases of how probable it is to borow from another
+        # language should be present in the population. So there is a very low chance that
+        # this will borow a form from a language with few speakers.
         speaker = self.random.choice(bilinguals)
 
+        # select a language to borrow from from the chosen biligual's repertoire.
         languageBorrowedFrom = self.random.choice(speaker.languageRepertoire)
+        # base case, no recursion
         if(languageBorrowedFrom is not self):
             borrowedForm = self.random.choice(languageBorrowedFrom.formMeaningDict[meaning])
+        # call this function again if we choose this language to borrow from.
         elif(languageBorrowedFrom is self):
             self.borrow_form(meaning)
+        # this shouldn't happen, but something might break, who knows.
         else:
             borrowedForm = (None, 0, 0, languageBorrowedFrom)
-            print("something has gone wrong when borrowing a form."
+            print("something has gone wrong when borrowing a form.")
 
+        # append the form onto the value list for the key meaning selected.
         self.formMeaningDict[meaning].append(borrowedForm)
 
     def lose_form(self, lossLimit):
+        # this has not been tested!
         # this function is for the chance that a form becomes so obscure that
         # it is no longer used in the language.
         # This can also occur randomly to kick-start the bias process.
@@ -471,7 +485,7 @@ class Speaker_Agent(Agent):
                 totalOfLikelyhoods.append(intraLanguageLikelyhoods[i][1])
                 # the total of the likelyhoods should sum to 1, I believe
                 # it currently does not.
-            sumOfTotals = math.fsum(totalOfLikelyhoods)    
+            sumOfTotals = math.fsum(totalOfLikelyhoods)
             x = 10 * sumOfTotals
             y = 9 * sumOfTotals
             if(x - y == 1.0):
@@ -480,7 +494,7 @@ class Speaker_Agent(Agent):
             print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
                   sumOfTotals)
 
-        print("likelyhoods: ", intraLanguageLikelyhoods[:][:][:-1])
+        print("likelyhoods: ", intraLanguageLikelyhoods)
         print("\n\tSTEP END\n")
 
 class DivergenceModel(Model):
