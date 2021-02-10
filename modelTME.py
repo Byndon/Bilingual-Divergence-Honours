@@ -1,5 +1,6 @@
 from mesa import Agent, Model
 from mesa.time import RandomActivation
+from mesa.datacollection import DataCollector
 import math
 import pandas
 import csv
@@ -59,6 +60,9 @@ class Language:
         # Borrowings should be marked accordingly with an addition to the
         # string indicating where they were brrowed from.
 
+        # currently this won't work for monolingual communities,
+        # as there are by definition no bilinguals
+
         # make a list of bilingual speakers, so that i don't choose something which will cause
         # an endless loop of this function calling itself.
         bilinguals = [speaker for speaker in self.speakers if len(speaker.languageRepertoire) > 1]
@@ -81,8 +85,12 @@ class Language:
             borrowedForm = (None, 0, 0, languageBorrowedFrom)
             print("something has gone wrong when borrowing a form.")
 
+        # edit the borrowed form to make a new "borrowed form" tuple.
+        # the frequency of the borrowed form is maintained. Perhaps it should be an average of all the forms in use in this language?
+        borrowedFormNew = (borrowedForm[0], borrowedForm[1], 0,
+                           self.language, borrowedForm[3].languageName)
         # append the form onto the value list for the key meaning selected.
-        self.formMeaningDict[meaning].append(borrowedForm)
+        self.formMeaningDict[meaning].append(borrowedFormNew)
 
     def lose_form(self, lossLimit):
         # this has not been tested!
@@ -156,6 +164,7 @@ class Speaker_Agent(Agent):
         self.language_repertoire_add(L1)
         self.L1 = L1
         self.Community = None
+        self.lastMeaning = "Nothing"
 
     def language_repertoire_add(self, language):
         if(type(language) is Language):
@@ -341,7 +350,7 @@ class Speaker_Agent(Agent):
         summationList = []  # declare a list to sum over.
         for language in self.languageRepertoire:
             # calculate PM for each language
-            PM = self.Calculate_PM_f_sl(form, meaning, language)  
+            PM = self.Calculate_PM_f_sl(form, meaning, language)
             summationList.append(1 / L * PM)  # add product of 1/L and PM to list for summation.
 
         PBM = math.fsum(summationList)  # sum list.
@@ -439,8 +448,10 @@ class Speaker_Agent(Agent):
     def step(self):
         print("\n\tSTEP START:\n")
         # select a meaning to be produced at random. This is the target meaning.
-        meaning = self.select_meaning()
 
+        meaning = self.select_meaning()
+        self.lastMeaning = meaning
+        print(self.lastMeaning)
         print("I am Agent {}, I am in community {}, and I speak {}".format(
             self.name, self.Community.communityName, str(
                 [language.languageName for language in self.languageRepertoire])))
@@ -448,22 +459,29 @@ class Speaker_Agent(Agent):
         # and the language to which it belongs.
         print("meaning: ", meaning, "\n")
 
-        intraLanguageLikelyhoods = []
+        probabilitiesList = []
+        formsList = []
+        likelyhoods = []
         # for every language in the agent's repertoire,
         # calculate the likelyhood of producing a form f
         # for the meaning s in that language.
         # calculates probability of every form for the intended meaning
         # across the entire repertoire of langauges.
         for language in self.languageRepertoire:
-            intraLanguageLikelyhoods.clear()
+            likelyhoods.clear()
             for form in language.formMeaningDict[meaning]:
                 p = self.Calculate_PC_f_stbm(
                     form, meaning, language,
                     self.Community.communityLanguage,
                     self.mode, self.monitoring)
-                print("  PC_f_stbm", form, p, language.languageName)
-                intraLanguageLikelyhoods.append((
+                print("  PC_f_stbm", form, " p = ", p, language.languageName)
+                likelyhoods.append((
                     form, p))
+                # get the probability of the form and add it to this list
+                # for choosing a form by this weight later
+                probabilitiesList.append(p)
+                # get the form to choose later with self.random.choices()
+                formsList.append(form)
 
             # a list to hold the likelyhood calculations to check they sum to 1
             ### TME: Problem 1, you are suming up the likelihoods across all languages
@@ -480,9 +498,9 @@ class Speaker_Agent(Agent):
             (doppels where l != t are also given probability 1.0)
             '''
             totalOfLikelyhoods = []
-            for i in range(len(intraLanguageLikelyhoods)):
+            for i in range(len(likelyhoods)):
                 # take the likelyhood calulated for each for from the tuple for summation.
-                totalOfLikelyhoods.append(intraLanguageLikelyhoods[i][1])
+                totalOfLikelyhoods.append(likelyhoods[i][1])
                 # the total of the likelyhoods should sum to 1, I believe
                 # it currently does not.
             sumOfTotals = math.fsum(totalOfLikelyhoods)
@@ -493,8 +511,29 @@ class Speaker_Agent(Agent):
 
             print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
                   sumOfTotals)
-
-        print("likelyhoods: ", intraLanguageLikelyhoods)
+        
+        # Here I need the agents to select a form from the distribution to produce,
+        # and then +1 to the 3rd element of the form tuple (form[2]). Must reconstruct the tuple
+        # because tuples are immutable.
+        formProduced = self.random.choices(formsList, probabilitiesList, k=1)
+        formString = formProduced[0][0]  # first pull tuple out of list, then string out of tuple.
+        # if the language produced is the community language (i.e. the target).
+        target = self.Community.communityLanguage
+        '''
+        Only look at the particular meaning intended to be conveyed, as context would limit the
+        scope of homophones and as such not affect them as much. In any case this ignores homophones.
+        '''
+        dictionaryList = []
+        for form in target.formMeaningDict[meaning]:
+            if(formString == form[0]):
+                # if the form is from another language, but is a doppel with the target, update
+                form = (form[0], form[1], form[2] + 1, form[3])
+                # need to put this form into the list value for the key in the dict.
+            else:
+                form = form
+            dictionaryList.append(form)
+            print(form)
+        target.formMeaningDict[meaning] = dictionaryList
         print("\n\tSTEP END\n")
 
 class DivergenceModel(Model):
@@ -543,10 +582,25 @@ class DivergenceModel(Model):
                             currentNumberOfLanguages += 1
                 self.schedule.add(speaker)
                 currentPopulation += 1
+        for agent in self.schedule.agents:
+            print("Agent:", agent.name, "| Repertoire:",
+                  ",".join([lang.languageName for lang in agent.languageRepertoire]),
+                  "| Community:", agent.Community.communityName)
 
     def step(self):
         self.schedule.step()
-        print("done")
+        # increase the tally based on how many times each form was prodcued by an agent
+        add = lambda x, y : x + y
+        for language in self.languages:
+            print(language.languageName)
+            for meaning in language.formMeaningDict:
+                print("\t", meaning)
+                dictionaryList = []
+                for form in language.formMeaningDict[meaning]:
+                    form = (form[0], add(form[1], form[2]), 0, form[3])
+                    print("\t\t", form)
+                    dictionaryList.append(form)
+                language.formMeaningDict[meaning] = dictionaryList
         # here i must also set the NewTally equal to the Tally, so that the new frequencies can be used in the next time step, unless the frequency being updated with each use is intended.
 
 # define language objects.
