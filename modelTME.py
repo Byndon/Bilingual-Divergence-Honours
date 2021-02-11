@@ -1,10 +1,28 @@
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
+from mesa.batchrunner import BatchRunner
 import math
+import itertools
 import pandas
 import csv
 import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
+
+def get_frequencies(model):
+    all = {}
+    for language in model.languages:
+        meanings = {}
+        for meaning in language.formMeaningDict:
+            forms = []
+            frequencies = []
+            for form in language.formMeaningDict[meaning]:
+                forms.append(form[0])
+                frequencies.append(form[1])
+            zippedList = list(itertools.zip_longest(forms, frequencies, fillvalue=None))
+            meanings[meaning] = zippedList
+        all[language.languageName] = meanings
+    return(all)
+
 
 class Language:
     '''
@@ -395,10 +413,12 @@ class Speaker_Agent(Agent):
         # k_c(s;t,b,m) = \frac{1}{\sum_f Q_c(f|s;t,b,m)}
 
         summationList = []
+        '''
         print("Calculate_PC_f_stbm:")
         print("  target.formMeaningDict:", " ".join(map(
             lambda x: str(x[0]), target.formMeaningDict[meaning])), " = P(%s|%s,%s)" % (
                 form, meaning, language.languageName))
+        '''
         # lambda x: str(x[0]) takes the 0th item in the list x and converts it to a string.
         for forms in target.formMeaningDict[meaning]:
             x = self.Calculate_QC_f_stbm(forms, meaning, language, target, b_mode, monitor)
@@ -431,8 +451,10 @@ class Speaker_Agent(Agent):
         which is not my target language? This should be a relatively low probability.
         
         '''
+        '''
         print("k_C: ", k_C)
         print("  PC_f_stbm:", 1.0 / k_C, meaning, language.languageName, target.languageName)
+        '''
         # CB: do we want to print 1.0/k_C here? 1/k_C is the inverse of the variable k_C.
         # so if k_C was 25, 1/k_C would be 0.04.
         # what is the range of values of k_C
@@ -446,11 +468,14 @@ class Speaker_Agent(Agent):
         return(P_C)
 
     def step(self):
+        '''
         print("\n\tSTEP START:\n")
+        '''
         # select a meaning to be produced at random. This is the target meaning.
 
         meaning = self.select_meaning()
         self.lastMeaning = meaning
+        '''
         print(self.lastMeaning)
         print("I am Agent {}, I am in community {}, and I speak {}".format(
             self.name, self.Community.communityName, str(
@@ -458,7 +483,7 @@ class Speaker_Agent(Agent):
         # a list to hold tuples containing the form, likelyhood of production,
         # and the language to which it belongs.
         print("meaning: ", meaning, "\n")
-
+        '''
         probabilitiesList = []
         formsList = []
         likelyhoods = []
@@ -474,9 +499,11 @@ class Speaker_Agent(Agent):
                     form, meaning, language,
                     self.Community.communityLanguage,
                     self.mode, self.monitoring)
+                '''
                 print("  PC_f_stbm", form, " p = ", p, language.languageName)
                 likelyhoods.append((
                     form, p))
+                '''
                 # get the probability of the form and add it to this list
                 # for choosing a form by this weight later
                 probabilitiesList.append(p)
@@ -508,10 +535,10 @@ class Speaker_Agent(Agent):
             y = 9 * sumOfTotals
             if(x - y == 1.0):
                 sumOfTotals = 1.0
-
+            '''
             print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
                   sumOfTotals)
-        
+            '''
         # Here I need the agents to select a form from the distribution to produce,
         # and then +1 to the 3rd element of the form tuple (form[2]). Must reconstruct the tuple
         # because tuples are immutable.
@@ -532,9 +559,11 @@ class Speaker_Agent(Agent):
             else:
                 form = form
             dictionaryList.append(form)
-            print(form)
+            # print(form)
         target.formMeaningDict[meaning] = dictionaryList
+        '''
         print("\n\tSTEP END\n")
+        '''
 
 class DivergenceModel(Model):
     def __init__(self, languageObjectList, communityObjectList, network, mode=False, monitoring=False, seed=12345):
@@ -543,6 +572,7 @@ class DivergenceModel(Model):
         self.model_population = sum([community.communitySize for community in communityObjectList])
         self.languages = languageObjectList
         self.network = network
+        self.running = True
 
         currentPopulation = 0
         for community in communityObjectList:
@@ -586,19 +616,22 @@ class DivergenceModel(Model):
             print("Agent:", agent.name, "| Repertoire:",
                   ",".join([lang.languageName for lang in agent.languageRepertoire]),
                   "| Community:", agent.Community.communityName)
-
+        self.datacollector = DataCollector(
+            model_reporters={"Frequencies": get_frequencies},
+            agent_reporters={"Last Meaning": "lastMeaning"}
+        )
     def step(self):
+        self.datacollector.collect(self)
         self.schedule.step()
         # increase the tally based on how many times each form was prodcued by an agent
-        add = lambda x, y : x + y
         for language in self.languages:
-            print(language.languageName)
+            # print(language.languageName)
             for meaning in language.formMeaningDict:
-                print("\t", meaning)
+                # print("\t", meaning)
                 dictionaryList = []
                 for form in language.formMeaningDict[meaning]:
-                    form = (form[0], add(form[1], form[2]), 0, form[3])
-                    print("\t\t", form)
+                    form = (form[0], sum([form[1], form[2]]), 0, form[3])
+                    # print("\t\t", form)
                     dictionaryList.append(form)
                 language.formMeaningDict[meaning] = dictionaryList
         # here i must also set the NewTally equal to the Tally, so that the new frequencies can be used in the next time step, unless the frequency being updated with each use is intended.
@@ -627,19 +660,19 @@ for eachlanguage in languageList:
     eachlanguage.formMeaningDict.clear()
 # for testing I include 2 meanings. All are 50-50 frequencies for ease,
 # and there are some doppels.
-language1.add_meaning("Lizard", [("wiri-wiri", 50, 0, language1), ("mirdi", 50, 0, language1)])
-language2.add_meaning("Lizard", [("wiri-wiri", 50, 0, language2)])
-language3.add_meaning("Lizard", [("wiri-wiri", 50, 0, language3), ("mirdi", 50, 0, language3), ("marnara", 50, 0, language3)])
-language4.add_meaning("Lizard", [("julirri", 50, 0, language4), ("jindararda", 50, 0, language4)])
-language5.add_meaning("Lizard", [("jindararda", 50, 0, language5), ("wiri-wiri", 50, 0, language5)])
-language6.add_meaning("Lizard", [("mirdi", 50, 0, language6), ("jindararda", 50, 0, language6)])
+language1.add_meaning("Lizard", [("wiri-wiri", 10, 0, language1), ("mirdi", 10, 0, language1)])
+language2.add_meaning("Lizard", [("wiri-wiri", 10, 0, language2)])
+language3.add_meaning("Lizard", [("wiri-wiri", 10, 0, language3), ("mirdi", 10, 0, language3), ("marnara", 10, 0, language3)])
+language4.add_meaning("Lizard", [("julirri", 10, 0, language4), ("jindararda", 10, 0, language4)])
+language5.add_meaning("Lizard", [("jindararda", 10, 0, language5), ("wiri-wiri", 10, 0, language5)])
+language6.add_meaning("Lizard", [("mirdi", 10, 0, language6), ("jindararda", 10, 0, language6)])
 
-language1.add_meaning("kangaroo", [("yawarda", 50, 0, language1), ("marlu", 50, 0, language1)])
-language2.add_meaning("kangaroo", [("yawarda", 50, 0, language2)])
-language3.add_meaning("kangaroo", [("marlu", 50, 0, language3)])
-language4.add_meaning("kangaroo", [("yawarda", 50, 0, language4)])
-language5.add_meaning("kangaroo", [("yawarda", 50, 0, language5), ("marlu", 50, 0, language5)])
-language6.add_meaning("kangaroo", [("marlu", 50, 0, language6)])
+language1.add_meaning("kangaroo", [("yawarda", 10, 0, language1), ("marlu", 10, 0, language1)])
+language2.add_meaning("kangaroo", [("yawarda", 10, 0, language2)])
+language3.add_meaning("kangaroo", [("marlu", 10, 0, language3)])
+language4.add_meaning("kangaroo", [("yawarda", 10, 0, language4)])
+language5.add_meaning("kangaroo", [("yawarda", 10, 0, language5), ("marlu", 10, 0, language5)])
+language6.add_meaning("kangaroo", [("marlu", 10, 0, language6)])
 
 # define the communities to which agent's can belong.
 # this determines which language they speak natively.
@@ -669,4 +702,28 @@ testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.8
 # can be put in a loop to run many times.
 # determining number of loops and other parameters will be done by the runner script
 # when it is developed.
-testingModel.step()
+# self, languageObjectList, communityObjectList, network, mode=False, monitoring=False, seed=12345
+fixed_params = {
+    "languageObjectList": languageList,
+    "communityObjectList": communityList,
+    "network": socialNet
+}
+
+variable_params = {
+    "mode": range(0.1, 1.0, 0.1),
+    "monitoring": range(0.1, 1.0, 0.1)
+}
+
+batch_run = BatchRunner(
+    DivergenceModel,
+    variable_params,
+    fixed_params,
+    iterations=5,
+    max_steps=100,
+    model_reporters={"Frequencies": get_frequencies}
+)
+
+batch_run.run_all()
+
+dataframeModel = testingModel.datacollector.get_model_vars_dataframe()
+dataframeAgents = testingModel.datacollector.get_agent_vars_dataframe()
