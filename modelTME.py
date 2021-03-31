@@ -21,7 +21,7 @@ def get_frequencies(model):
             zippedList = list(itertools.zip_longest(forms, frequencies, fillvalue=None))
             meanings[meaning] = zippedList
         all[language.languageName] = meanings
-    return(all)
+    return(all)  # perhaps retrn all langage dictionaries as separate variables?
 
 
 class Language:
@@ -245,8 +245,7 @@ class Speaker_Agent(Agent):
                 numberOfPairings = formString[1]
                 # there shouldn't be any occurences of more
                 # than 1 of the same form for a particular meaning.
-                break
-
+            # there was a break here
         return(numberOfPairings)
 
     def Calculate_R_fs_l(self, form, meaning, language):
@@ -397,7 +396,7 @@ class Speaker_Agent(Agent):
 
         k_L = self.Calculate_k_L(form, meaning)
         CardinalityOfL = len(self.languageRepertoire)
-        PM = self.Calculate_PM_f_sl(form, meaning, target)# pass target instead of language. No need for language argument. 
+        PM = self.Calculate_PM_f_sl(form, meaning, target)  # pass target instead of language. No need for language argument. 
         return(monitor * k_L * PM + (1 - monitor) / CardinalityOfL)
 
     def Calculate_QC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
@@ -420,9 +419,13 @@ class Speaker_Agent(Agent):
                 form, meaning, language.languageName))
         '''
         # lambda x: str(x[0]) takes the 0th item in the list x and converts it to a string.
-        for forms in target.formMeaningDict[meaning]:
+
+        # this calculates probabilities for each form in the target.
+        for forms in language.formMeaningDict[meaning]:  # language was target on this line.j
             x = self.Calculate_QC_f_stbm(forms, meaning, language, target, b_mode, monitor)
             summationList.append(x)
+        # then we sum the probabilities and create a normalising constant
+        # such that they sum to 1 when multiplied by this constant
         k_C = 1.0 / math.fsum(summationList)
 
         # P_C(f|s;t,b,m) = k Q_C(f|s;t,b,m)
@@ -450,6 +453,7 @@ class Speaker_Agent(Agent):
         This isthe agent asking: what is the probability that I produce a word from a language
         which is not my target language? This should be a relatively low probability.
         
+        CB 20213003: I am not sure if I was correct here. The normalising constant should be capable of normalising for the language currently being used to compute the probability. ?
         '''
         '''
         print("k_C: ", k_C)
@@ -475,14 +479,31 @@ class Speaker_Agent(Agent):
 
         meaning = self.select_meaning()
         self.lastMeaning = meaning
-        '''
+
         print(self.lastMeaning)
+
         print("I am Agent {}, I am in community {}, and I speak {}".format(
             self.name, self.Community.communityName, str(
                 [language.languageName for language in self.languageRepertoire])))
         # a list to hold tuples containing the form, likelyhood of production,
         # and the language to which it belongs.
+        '''
         print("meaning: ", meaning, "\n")
+
+
+        example output that is wrong:
+        Lizard
+        I am Agent 6, I am in community Com1, and I speak ['Language1', 'Language5', 'Language6']
+        PC_f_stbm ('wiri-wiri', 10, 4, <__main__.Language object at 0x7f73046387f0>)  p =  0.5 Language1
+        PC_f_stbm ('mirdi', 10, 3, <__main__.Language object at 0x7f73046387f0>)  p =  0.5 Language1
+        PC_f_stbm ('jindararda', 10, 2, <__main__.Language object at 0x7f72edd717b8>)  p =  0.024733768464445208 Language5
+        PC_f_stbm ('wiri-wiri', 10, 3, <__main__.Language object at 0x7f72edd717b8>)  p =  0.5 Language5
+        PC_f_stbm ('mirdi', 10, 3, <__main__.Language object at 0x7f72edd999b0>)  p =  0.5 Language6
+        PC_f_stbm ('jindararda', 10, 2, <__main__.Language object at 0x7f72edd999b0>)  p =  0.024733768464445208 Language6
+
+        Language 1 has the expected output: in L1, there is a 50-50 chance based on 2 forms having the same frequency (10)
+        L5 is wrong as it only sums to 0.5247...etc. both at the same frequency should sum to 1, but p should still be < 0.5 due to anti doppel bias, as it has a doppel in L6 (so does wiri-wiri in L1)
+        The same situation exists with L6.
         '''
         probabilitiesList = []
         formsList = []
@@ -494,16 +515,18 @@ class Speaker_Agent(Agent):
         # across the entire repertoire of langauges.
         for language in self.languageRepertoire:
             likelyhoods.clear()
+            # this calculates P_C for the language.
+            # normalising term doesn't match the line at 424.
             for form in language.formMeaningDict[meaning]:
                 p = self.Calculate_PC_f_stbm(
                     form, meaning, language,
                     self.Community.communityLanguage,
                     self.mode, self.monitoring)
-                '''
+
                 print("  PC_f_stbm", form, " p = ", p, language.languageName)
                 likelyhoods.append((
                     form, p))
-                '''
+
                 # get the probability of the form and add it to this list
                 # for choosing a form by this weight later
                 probabilitiesList.append(p)
@@ -535,10 +558,10 @@ class Speaker_Agent(Agent):
             y = 9 * sumOfTotals
             if(x - y == 1.0):
                 sumOfTotals = 1.0
-            '''
+
             print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
                   sumOfTotals)
-            '''
+
         # Here I need the agents to select a form from the distribution to produce,
         # and then +1 to the 3rd element of the form tuple (form[2]). Must reconstruct the tuple
         # because tuples are immutable.
@@ -620,6 +643,8 @@ class DivergenceModel(Model):
             model_reporters={"Frequencies": get_frequencies},
             agent_reporters={"Last Meaning": "lastMeaning"}
         )
+
+
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
@@ -638,10 +663,12 @@ class DivergenceModel(Model):
 
 # define language objects.
 # i don't currently care about the words and stuff
+# next 4 lines just for when it is split in org-source blocks
 # from model import DivergenceModel
 # from model import Language
 # from model import Community
 # import networkx as nx
+
 
 # ensure the languages exist.
 language1 = Language("Language1")
@@ -703,27 +730,29 @@ testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.8
 # determining number of loops and other parameters will be done by the runner script
 # when it is developed.
 # self, languageObjectList, communityObjectList, network, mode=False, monitoring=False, seed=12345
-fixed_params = {
-    "languageObjectList": languageList,
-    "communityObjectList": communityList,
-    "network": socialNet
-}
+# fixed_params = {
+#     "languageObjectList": languageList,
+#     "communityObjectList": communityList,
+#     "network": socialNet
+# }
 
-variable_params = {
-    "mode": range(0.1, 1.0, 0.1),
-    "monitoring": range(0.1, 1.0, 0.1)
-}
+# variable_params = {
+#     "mode": range(0.1, 1.0, 0.1),
+#     "monitoring": range(0.1, 1.0, 0.1)
+# }
 
-batch_run = BatchRunner(
-    DivergenceModel,
-    variable_params,
-    fixed_params,
-    iterations=5,
-    max_steps=100,
-    model_reporters={"Frequencies": get_frequencies}
-)
+# batch_run = BatchRunner(
+#     DivergenceModel,
+#     variable_params,
+#     fixed_params,
+#     iterations=5,
+#     max_steps=100,
+#     model_reporters={"Frequencies": get_frequencies}
+# )
 
-batch_run.run_all()
+# batch_run.run_all()
 
+testingModel.step()
+# need a better way of dealing with the model data. it's just a dictionary containing dictionaries, which is messy.
 dataframeModel = testingModel.datacollector.get_model_vars_dataframe()
 dataframeAgents = testingModel.datacollector.get_agent_vars_dataframe()
