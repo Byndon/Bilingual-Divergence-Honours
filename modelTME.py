@@ -618,13 +618,23 @@ class DivergenceModel(Model):
             communityConnections = [tuple(elem for elem in sub if elem != community) for sub in
                                     list(network.edges.data("weight")) if community in sub]
             # calculate the weight of the native community l1
-            weightOfCommunityL1 = 1 - math.fsum([i[1] for i in communityConnections])
+            # need to normalise this to conserve weights.
+            weights = [i[1] for i in communityConnections]
+            weightOfCommunityL1 = 1
+            # the weight of the community will always be 1 (highest weight)
+            weights.append(weightOfCommunityL1)
+            normalisingTerm = 1 / math.fsum(weights)  # calculate nromalising term
+            newWeights = [normalisingTerm * i for i in weights]
+            # use normalising term to determine relative weights.
+            # weightOfCommunityL1 = 1 - math.fsum([i[1] for i in communityConnections])  # OLD 
+            # weightOfCommunityL1 =  # no longer needed as we are calculating the weights differently.
             # include this in the possible choices for assigning a language.
             communityConnections.append((community, weightOfCommunityL1))
+
             for population in range(community.communitySize):
                 # returns a list of the choices. This list is a single value as only 1 choice is being made.
                 communityOfL1 = self.random.choices([i[0] for i in communityConnections],
-                                                    [j[1] for j in communityConnections], k=1)
+                                                    newWeights, k=1)  # weights was [j[1] for j in communityConnections]
                 # take the 0th item in the list (the language object) and select this as the l1.
                 agentL1 = communityOfL1[0].communityLanguage
                 speaker = Speaker_Agent(currentPopulation, self, agentL1, mode, monitoring)
@@ -703,14 +713,14 @@ for eachlanguage in languageList:
 # for testing I include 2 meanings. All are 50-50 frequencies for ease,
 # and there are some doppels.
 language1.add_meaning("Lizard", [("wiri-wiri", 10, 0, language1), ("mirdi", 10, 0, language1)])
-language2.add_meaning("Lizard", [("wiri-wiri", 10, 0, language2)])
+language2.add_meaning("Lizard", [("wiri-wiri", 10, 0, language2), ("julirri", 10, 0, language2)])
 # language3.add_meaning("Lizard", [("wiri-wiri", 10, 0, language3), ("mirdi", 10, 0, language3), ("marnara", 10, 0, language3)])
 # language4.add_meaning("Lizard", [("julirri", 10, 0, language4), ("jindararda", 10, 0, language4)])
 # language5.add_meaning("Lizard", [("jindararda", 10, 0, language5), ("wiri-wiri", 10, 0, language5)])
 # language6.add_meaning("Lizard", [("mirdi", 10, 0, language6), ("jindararda", 10, 0, language6)])
 
 language1.add_meaning("kangaroo", [("yawarda", 10, 0, language1), ("marlu", 10, 0, language1)])
-language2.add_meaning("kangaroo", [("yawarda", 10, 0, language2)])
+language2.add_meaning("kangaroo", [("yawarda", 10, 0, language2), ("ganguru", 10, 0, language2)])
 # language3.add_meaning("kangaroo", [("marlu", 10, 0, language3)])
 # language4.add_meaning("kangaroo", [("yawarda", 10, 0, language4)])
 # language5.add_meaning("kangaroo", [("yawarda", 10, 0, language5), ("marlu", 10, 0, language5)])
