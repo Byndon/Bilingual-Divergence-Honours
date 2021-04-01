@@ -1,0 +1,75 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:t ^:t arch:headline
+#+options: author:t broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
+#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
+#+options: timestamp:t title:t toc:t todo:t |:t
+#+title: step-by-step
+#+date: <2021-04-01 Thu>
+#+author: Callan Bindon
+#+email: callan@BINDON
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 26.3 (Org mode 9.4)
+
+* What Am I making a Simulation for?
+The intent of my project is to be able to look at the possible connections between Indigenous groups in pre-colonial Victoria. Essentially I will be attempting to discover connections between the groups using the idea that languages in contact that are similar to each other will diverge more quickly based on the anti-doppel bias, where ones with less contact will diverge more slowly.
+
+I intend to run a variety of simulations with different parameters for group interaction based on a network of communities which have speaker that produce lexical items at each step of the simulation, affected by Luisa and Mark's lexical production model.
+
+* The Simulation
+The Simulation is made using the Mesa python3 library for creating Agent-Based models. This has been done as I have absolutely no idea how to use R, and had no idea how to read Mark's object-oriented R code that he wrote his model in, nor the variety of libraries that he used for the agents. I was familiar with python, I had never used mesa before, but it seemed more beginner friendly than whatever TensorA is used for in R, and I wanted something with a bit less focus on graphics as something like netlogo.
+
+The simulation model code is designed differently to Mark's code as well, but I would be out of my depth if I were to try to expain the differences. The main intention is to have agents who produce forms probabilistically after running through the Anti-Doppel Bias model.
+
+The model in the simulation consists of 3 main classes:
+** The Language class
+This is the class which stores data about the language.
+- Objects of this class have a Name,
+- a dictionary consisting of meaning keys with a list of forms as values for those keys,
+- and a list of Agent objects who can speak that language
+** The Community Class
+This class stores information about each group of speakers who are expected to have frequent interaction, perhaps a real analogue would be a group of speakers as a tribe or extended family group.
+- Objects of this class have a Name (of the community),
+- a list of members who live within that community,
+- a reference to the 'native' language of the community,
+- a size (i.e. the number of Agents that are associated with the community)
+
+*** Network
+The community objects are linked through a weighted network. This network is a representation of how much interaction groups have with each other. A low weight indicates a low level of interaction, similarly a high weight indiactes high-levels of interaction.
+
+- levels of interaction (and thus the network edge weightings) indicate how likely it is for a speaker in one language group to speak the language of another group. A speaker is more likely to speak the language of a group they have more contact with.
+- All speakers are equally likely (as the model currently is programmed) to speak a second language, slightly less likely to speak a third, even less likely to speak a fourth, and so on.
+- The weightings affect what their additional languages are likely to be. If a speaker has more interaction with a aprticular group, they are probably more likely to speak that group's language as an L2 than that of another group they interact with less frequently.
+
+** The Agent Class
+These are the simulations representation of individuals within each community.
+- objects of this class have a unique identifying number,
+- a list of languages which they can speak based on the languages that they come into contact with through the network of communities,
+- a Monitoring level (either dictated by the model, or set based on the make-up of speakers in their group),
+- a language mode parameter (dictated by the model, as we currently haven't come to a conclusion on the best way to dynamically determine this yet),
+- a variable which identifies their L1 language, in order to allow communities to have members who are L2 speakers of the community language,
+- A variable to indicate the previous meaning they produced a form for (mostly for debugging pursposes)
+- This class has all the code for calculating the probability of producing a given form as class methods, and the 'step' method within this form runs this calculation for each form in ach language in the agent object's repertoire.
+
+* The steps
+** set-up
+The initial set-up should not have many, if any, issues. It simply takes lists of community and language objects, associates the two, and generates a numer of agents for each based on the parameters given when creating the community object. Agents are generated and assigned languages based on the community which they are generated for (they will speak the community language) and the network edges connecting their community to others. Some may have an L1 different to the community 'native' language.
+** Simulation steps
+For each step of the simulation:
+1) all Agents in the simulation randomly select a meaning (the key) from their L1 language's form-Meaning Dictionary.
+2) Then, for each form associated with that meaning, in their whole linguistic repertoire,
+   the agent will attempt to calculate the probability of producing that form, as per the complete model equation 11 (page 267) described in the Ellison & Miceli paper (2017).
+3) The forms and their probabilities are then selected randomly, using the probabilities calulated for each form as a weight over its selection.
+4) As we care mainly about the realisation of the form, we want to update the frequency of the form used if it matches a form in the target language (the language of the community is the target for simplicity).
+
+   This is done AFTER all agents have had their turn, to avoid the previous agent's production affecting the frequency of the next agent, as their turns are supposed to be simultaneous.
+   - If the string of letters that make up the form (i.e form[0] in the form tuple) match to a form which is associated with the target language, the tally being used to track productions of that form is increased by 1.
+     The tally is used to calculate relative frequency when the agent is calcuating each form. Interestingly this will result in a smaller percentage gain in more commonly used forms and a larger percentage gain in less-used forms whenever they get produced by a speaker. This might affect the speed of change diachronically, but I don't believe it should affect the calculation for each agent.
+
+   - We cannot update the tally for a language which is not the target, this is partly intended, as a somebody speaking a different language that their interlocutors might not understand wouldn't affect the frequency of a form in the language of the community they are speaking in.
+     It is also due to the design of the program, as for simplicity a language is only present once so updating the frequency of a form produced by a speaker in a disparate community would also affect the frequency of the community for which it is their native language. This was an ovesight of my design. And I will attempt to change this if I can get the calculations working appropriately.
+     
+5) After the usages are tallied, the next simulation step can be done, using the new frequency information based on what was produced in the previous step. Currently the program only does 1 step, as I have been trying to reduce complexity to find problems.
+
+
