@@ -229,7 +229,7 @@ class Speaker_Agent(Agent):
         # from all possible meanings in one of the agent's languages.
         # meanings are the keys for the dictionary
         # I use L1 (the first language in the repertoire list)
-        # out of convenience, all languages can express the same meanings.
+        # out of convenience. All languages can express the same meanings.
 
         # make a random choice from a list of the dictionary keys.
         meaningChosen = self.random.choice(list(self.languageRepertoire[0].formMeaningDict.keys()))
@@ -275,8 +275,21 @@ class Speaker_Agent(Agent):
         numberOfPairings = self.Calculate_N_fs_l(form, meaning, language)
 
         # double summation requires expanding the internal sigma and then computing the outer sigma.
-        summationListF = []
+        summationListL = []  # was previous summationListF
         summationListS = []
+
+        # THERE MAY BE AN ERROR HERE:
+        # does this actually do what it says?
+        # it appears as if it doesn't sum over languages, as it only looks at one language right now.
+        # this IS WRONG. Needs something along the lines of:
+
+        for language in self.languageRepertoire:
+            for meaning in language.formMeaningDict:
+                for each_form in language.formMeaningDict[meaning]:
+                    if(each_form[0] == form[0]):
+                        summationListS.append(self.Calculate_N_fs_l(form, meaning, language))
+            summationListL.append(math.fsum(summationListS))
+        
         # this is the denominator
         # this first loop expands \sum_lN(f,s|l)
         # for languages in self.languageRepertoire:
@@ -290,10 +303,10 @@ class Speaker_Agent(Agent):
         #     # in the agent's repertoire.
         #     summationListL.append(math.fsum(summationListS))
 
-        for meanings in language.formMeaningDict:
-            for forms in language.formMeaningDict[meanings]:
-                summationListF.append(self.Calculate_N_fs_l(forms, meanings, language))
-            summationListS.append(math.fsum(summationListF))
+        # for meanings in language.formMeaningDict:
+        #     for forms in language.formMeaningDict[meanings]:
+        #         summationListF.append(self.Calculate_N_fs_l(forms, meanings, language))
+        #     summationListS.append(math.fsum(summationListF))
                                       
                 
         # sum the frequencies for each language to get a total frequency
@@ -623,7 +636,9 @@ class DivergenceModel(Model):
                 # determine how many languages the agent can speak
                 numberOfLanguagesSpoken = self.random.choices(
                     [i + 1 for i in range(len(languageObjectList))],
-                    [0.6, 0.5, 0.4, 0.3, 0.2, 0.1], k=1)
+                    [0.6, 0.5], k=1)
+                # [0.6, 0.5, 0.4, 0.3, 0.2, 0.1], k=1)  # has to be same number of these as number of languages, or else it has errors in random library.
+                    
                 if(len(communityConnections) > 1
                    and numberOfLanguagesSpoken[0] > len(speaker.languageRepertoire)):
                     currentNumberOfLanguages = len(speaker.languageRepertoire)
@@ -673,13 +688,13 @@ class DivergenceModel(Model):
 # ensure the languages exist.
 language1 = Language("Language1")
 language2 = Language("Language2")
-language3 = Language("Language3")
-language4 = Language("Language4")
-language5 = Language("Language5")
-language6 = Language("Language6")
+# language3 = Language("Language3")
+# language4 = Language("Language4")
+# language5 = Language("Language5")
+# language6 = Language("Language6")
 
 # make a list of the languages to give to the model.
-languageList = [language1, language2, language3, language4, language5, language6]
+languageList = [language1, language2]  #, language3, language4, language5, language6]
 
 # input some meanings and forms into the languages
 for eachlanguage in languageList:
@@ -689,38 +704,39 @@ for eachlanguage in languageList:
 # and there are some doppels.
 language1.add_meaning("Lizard", [("wiri-wiri", 10, 0, language1), ("mirdi", 10, 0, language1)])
 language2.add_meaning("Lizard", [("wiri-wiri", 10, 0, language2)])
-language3.add_meaning("Lizard", [("wiri-wiri", 10, 0, language3), ("mirdi", 10, 0, language3), ("marnara", 10, 0, language3)])
-language4.add_meaning("Lizard", [("julirri", 10, 0, language4), ("jindararda", 10, 0, language4)])
-language5.add_meaning("Lizard", [("jindararda", 10, 0, language5), ("wiri-wiri", 10, 0, language5)])
-language6.add_meaning("Lizard", [("mirdi", 10, 0, language6), ("jindararda", 10, 0, language6)])
+# language3.add_meaning("Lizard", [("wiri-wiri", 10, 0, language3), ("mirdi", 10, 0, language3), ("marnara", 10, 0, language3)])
+# language4.add_meaning("Lizard", [("julirri", 10, 0, language4), ("jindararda", 10, 0, language4)])
+# language5.add_meaning("Lizard", [("jindararda", 10, 0, language5), ("wiri-wiri", 10, 0, language5)])
+# language6.add_meaning("Lizard", [("mirdi", 10, 0, language6), ("jindararda", 10, 0, language6)])
 
 language1.add_meaning("kangaroo", [("yawarda", 10, 0, language1), ("marlu", 10, 0, language1)])
 language2.add_meaning("kangaroo", [("yawarda", 10, 0, language2)])
-language3.add_meaning("kangaroo", [("marlu", 10, 0, language3)])
-language4.add_meaning("kangaroo", [("yawarda", 10, 0, language4)])
-language5.add_meaning("kangaroo", [("yawarda", 10, 0, language5), ("marlu", 10, 0, language5)])
-language6.add_meaning("kangaroo", [("marlu", 10, 0, language6)])
+# language3.add_meaning("kangaroo", [("marlu", 10, 0, language3)])
+# language4.add_meaning("kangaroo", [("yawarda", 10, 0, language4)])
+# language5.add_meaning("kangaroo", [("yawarda", 10, 0, language5), ("marlu", 10, 0, language5)])
+# language6.add_meaning("kangaroo", [("marlu", 10, 0, language6)])
 
 # define the communities to which agent's can belong.
 # this determines which language they speak natively.
 community1 = Community("Com1", language1, 10)
 community2 = Community("Com2", language2, 10)
-community3 = Community("Com3", language3, 10)
-community4 = Community("Com4", language4, 10)
-community5 = Community("Com5", language5, 10)
-community6 = Community("Com6", language6, 10)
+# community3 = Community("Com3", language3, 10)
+# community4 = Community("Com4", language4, 10)
+# community5 = Community("Com5", language5, 10)
+# community6 = Community("Com6", language6, 10)
 
-communityList = [community1, community2, community3, community4, community5, community6]
+communityList = [community1, community2]  # , community3, community4, community5, community6]
 # create network
 socialNet = nx.Graph()
 # create nodes from list of community objects
 # community objects ARE the nodes in this model
 socialNet.add_nodes_from(communityList)
 # add weighted connections between the nodes.
-socialNet.add_weighted_edges_from([
-    (community1, community6, 0.125), (community6, community5, 0.5),
-    (community1, community5, 0.1), (community2, community5, 0.1),
-    (community6, community4, 0.01), (community2, community4, 0.4)])
+socialNet.add_edge(community1, community2, weight=0.375)
+# socialNet.add_weighted_edges_from([
+#     (community1, community6, 0.125), (community6, community5, 0.5),
+#     (community1, community5, 0.1), (community2, community5, 0.1),
+#     (community6, community4, 0.01), (community2, community4, 0.4)])
 
 
 # make the model.
