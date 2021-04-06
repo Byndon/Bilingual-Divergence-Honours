@@ -434,6 +434,8 @@ class Speaker_Agent(Agent):
         # lambda x: str(x[0]) takes the 0th item in the list x and converts it to a string.
 
         # this calculates probabilities for each form in the target.
+        # fixing goes here: Need to do this for all forms from all languages in the repertoire,
+        # but only with the target language as t. No feeding in other languages.
         for forms in language.formMeaningDict[meaning]:  # language was target on this line.j
             x = self.Calculate_QC_f_stbm(forms, meaning, language, target, b_mode, monitor)
             summationList.append(x)
