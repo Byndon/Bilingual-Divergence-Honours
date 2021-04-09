@@ -436,10 +436,11 @@ class Speaker_Agent(Agent):
 
         # this calculates probabilities for each form in the target.
         # fixing goes here: Need to do this for all forms from all languages in the repertoire,
-        # but only with the target language as t. No feeding in other languages.
-        for forms in language.formMeaningDict[meaning]:  # language was target on this line.j
-            x = self.Calculate_QC_f_stbm(forms, meaning, target, target, b_mode, monitor)
-            summationList.append(x)
+        # but only with the target language as t. No feeding in other languages. 09042021##
+        for language in self.languageRepertoire:
+            for forms in language.formMeaningDict[meaning]:  # language was target on this line.j
+                x = self.Calculate_QC_f_stbm(forms, meaning, target, target, b_mode, monitor)
+                summationList.append(x)
         # then we sum the probabilities and create a normalising constant
         # such that they sum to 1 when multiplied by this constant
         k_C = 1.0 / math.fsum(summationList)
@@ -478,7 +479,7 @@ class Speaker_Agent(Agent):
         # CB: do we want to print 1.0/k_C here? 1/k_C is the inverse of the variable k_C.
         # so if k_C was 25, 1/k_C would be 0.04.
         # what is the range of values of k_C
-        P_C = k_C * self.Calculate_QC_f_stbm(form, meaning, language, target, b_mode, monitor)
+        P_C = k_C * self.Calculate_QC_f_stbm(form, meaning, target, target, b_mode, monitor)
 
         # check for rounding error 0.99 recurring.
         x = 10 * P_C
@@ -569,7 +570,7 @@ class Speaker_Agent(Agent):
             p = self.Calculate_PC_f_stbm(
                 form, meaning, target, target,
                 self.mode, self.monitoring)
-            print("  PC_f_stbm", form, " p = ", p, language.languageName)
+            print("  PC_f_stbm", form[:3], " p = ", p, form[3].languageName)
             likelyhoods.append((
                 form, p))
             probabilitiesList.append(p)
@@ -767,12 +768,12 @@ socialNet.add_nodes_from(communityList)
 socialNet.add_edge(community1, community2, weight=0.375)
 # socialNet.add_weighted_edges_from([
 #     (community1, community6, 0.125), (community6, community5, 0.5),
-#     (community1, community5, 0.1), (community2, community5, 0.1),
+#     (community1, community5, 0.1), (community2, community5, 0.1),pp
 #     (community6, community4, 0.01), (community2, community4, 0.4)])
 
 
 # make the model.
-testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.8)
+testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.1)
 # step the model once.
 # can be put in a loop to run many times.
 # determining number of loops and other parameters will be done by the runner script
