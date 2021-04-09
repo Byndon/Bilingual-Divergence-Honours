@@ -8,6 +8,7 @@ import pandas
 import csv
 import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
 
+
 def get_frequencies(model):
     all = {}
     for language in model.languages:
@@ -437,7 +438,7 @@ class Speaker_Agent(Agent):
         # fixing goes here: Need to do this for all forms from all languages in the repertoire,
         # but only with the target language as t. No feeding in other languages.
         for forms in language.formMeaningDict[meaning]:  # language was target on this line.j
-            x = self.Calculate_QC_f_stbm(forms, meaning, language, target, b_mode, monitor)
+            x = self.Calculate_QC_f_stbm(forms, meaning, target, target, b_mode, monitor)
             summationList.append(x)
         # then we sum the probabilities and create a normalising constant
         # such that they sum to 1 when multiplied by this constant
@@ -497,11 +498,18 @@ class Speaker_Agent(Agent):
 
         print(self.lastMeaning)
 
+        target = self.Community.communityLanguage
         print("I am Agent {}, I am in community {}, and I speak {}".format(
             self.name, self.Community.communityName, str(
                 [language.languageName for language in self.languageRepertoire])))
         # a list to hold tuples containing the form, likelyhood of production,
         # and the language to which it belongs.
+
+        allFormsForMeaning = []
+        for language in self.languageRepertoire:
+            for form in language.formMeaningDict[meaning]:
+                allFormsForMeaning.append(form)
+
         '''
         print("meaning: ", meaning, "\n")
 
@@ -528,32 +536,44 @@ class Speaker_Agent(Agent):
         # for the meaning s in that language.
         # calculates probability of every form for the intended meaning
         # across the entire repertoire of langauges.
-        for language in self.languageRepertoire:
-            likelyhoods.clear()
-            # this calculates P_C for the language.
-            # normalising term doesn't match the line at 424.
-            for form in language.formMeaningDict[meaning]:
-                p = self.Calculate_PC_f_stbm(
-                    form, meaning, language,
-                    self.Community.communityLanguage,
-                    self.mode, self.monitoring)
 
-                print("  PC_f_stbm", form, " p = ", p, language.languageName)
-                likelyhoods.append((
-                    form, p))
+        # ==============
+        # for language in self.languageRepertoire:
+        #     likelyhoods.clear()
+        #     # this calculates P_C for the language.
+        #     # normalising term doesn't match the line at 424.
+        #     for form in language.formMeaningDict[meaning]:
+        #         p = self.Calculate_PC_f_stbm(
+        #             form, meaning, language,
+        #             self.Community.communityLanguage,
+        #             self.mode, self.monitoring)
 
-                # get the probability of the form and add it to this list
-                # for choosing a form by this weight later
-                probabilitiesList.append(p)
-                # get the form to choose later with self.random.choices()
-                formsList.append(form)
+        #         print("  PC_f_stbm", form, " p = ", p, language.languageName)
+        #         likelyhoods.append((
+        #             form, p))
+
+        #         # get the probability of the form and add it to this list
+        #         # for choosing a form by this weight later
+        #         probabilitiesList.append(p)
+        #         # get the form to choose later with self.random.choices()
+        #         formsList.append(form)
 
             # a list to hold the likelyhood calculations to check they sum to 1
             ### TME: Problem 1, you are suming up the likelihoods across all languages
             ###      that have been looked at so far, in the following for-loop
             ###      The total of likelihoods needs to add up to 1.0 for each language
             ###      It still doesn't do that, but this difficulty makes it worse
+        # =============
 
+        for form in allFormsForMeaning:
+            p = self.Calculate_PC_f_stbm(
+                form, meaning, target, target,
+                self.mode, self.monitoring)
+            print("  PC_f_stbm", form, " p = ", p, language.languageName)
+            likelyhoods.append((
+                form, p))
+            probabilitiesList.append(p)
+            formsList.append(form)
             '''
             CB:
             Fixed summing over all languages, by adding the summing into the loop
@@ -562,20 +582,20 @@ class Speaker_Agent(Agent):
             Also 1 where l = t has 1 form, even with doppels where l != t
             (doppels where l != t are also given probability 1.0)
             '''
-            totalOfLikelyhoods = []
-            for i in range(len(likelyhoods)):
+        totalOfLikelyhoods = []
+        for i in range(len(likelyhoods)):
                 # take the likelyhood calulated for each for from the tuple for summation.
-                totalOfLikelyhoods.append(likelyhoods[i][1])
+            totalOfLikelyhoods.append(likelyhoods[i][1])
                 # the total of the likelyhoods should sum to 1, I believe
                 # it currently does not.
-            sumOfTotals = math.fsum(totalOfLikelyhoods)
-            x = 10 * sumOfTotals
-            y = 9 * sumOfTotals
-            if(x - y == 1.0):
-                sumOfTotals = 1.0
+        sumOfTotals = math.fsum(totalOfLikelyhoods)
+        x = 10 * sumOfTotals
+        y = 9 * sumOfTotals
+        if(x - y == 1.0):
+            sumOfTotals = 1.0
 
-            print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
-                  sumOfTotals)
+        print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
+              sumOfTotals)
 
         # Here I need the agents to select a form from the distribution to produce,
         # and then +1 to the 3rd element of the form tuple (form[2]). Must reconstruct the tuple
@@ -752,7 +772,7 @@ socialNet.add_edge(community1, community2, weight=0.375)
 
 
 # make the model.
-testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.84)
+testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.8)
 # step the model once.
 # can be put in a loop to run many times.
 # determining number of loops and other parameters will be done by the runner script
