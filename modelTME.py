@@ -4,6 +4,7 @@ from mesa.datacollection import DataCollector
 from mesa.batchrunner import BatchRunner
 import math
 import itertools
+import numpy
 import pandas
 import csv
 import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
@@ -604,12 +605,14 @@ class Speaker_Agent(Agent):
         formProduced = self.random.choices(formsList, probabilitiesList, k=1)
         formString = formProduced[0][0]  # first pull tuple out of list, then string out of tuple.
         # if the language produced is the community language (i.e. the target).
-        target = self.Community.communityLanguage
+        # target = self.Community.communityLanguage
         '''
         Only look at the particular meaning intended to be conveyed, as context would limit the
         scope of homophones and as such not affect them as much. In any case this ignores homophones.
         '''
         dictionaryList = []
+        # i think there is a problem here. Diachronically the doppel gets and enormous boost due to maintaining multiple different tallies and probably adding each.
+        # the problem might not be here.
         for form in target.formMeaningDict[meaning]:
             if(formString == form[0]):
                 # if the form is from another language, but is a doppel with the target, update
@@ -735,15 +738,15 @@ for eachlanguage in languageList:
     eachlanguage.formMeaningDict.clear()
 # for testing I include 2 meanings. All are 50-50 frequencies for ease,
 # and there are some doppels.
-language1.add_meaning("Lizard", [("wiri-wiri", 10, 0, language1), ("mirdi", 10, 0, language1)])
-language2.add_meaning("Lizard", [("wiri-wiri", 10, 0, language2), ("julirri", 10, 0, language2)])
+language1.add_meaning("Lizard", [("wiri-wiri", 100, 0, language1), ("mirdi", 100, 0, language1)])
+language2.add_meaning("Lizard", [("wiri-wiri", 100, 0, language2), ("julirri", 100, 0, language2)])
 # language3.add_meaning("Lizard", [("wiri-wiri", 10, 0, language3), ("mirdi", 10, 0, language3), ("marnara", 10, 0, language3)])
 # language4.add_meaning("Lizard", [("julirri", 10, 0, language4), ("jindararda", 10, 0, language4)])
 # language5.add_meaning("Lizard", [("jindararda", 10, 0, language5), ("wiri-wiri", 10, 0, language5)])
 # language6.add_meaning("Lizard", [("mirdi", 10, 0, language6), ("jindararda", 10, 0, language6)])
 
-language1.add_meaning("kangaroo", [("yawarda", 10, 0, language1), ("marlu", 10, 0, language1)])
-language2.add_meaning("kangaroo", [("yawarda", 10, 0, language2), ("ganguru", 10, 0, language2)])
+language1.add_meaning("kangaroo", [("yawarda", 100, 0, language1), ("marlu", 100, 0, language1)])
+language2.add_meaning("kangaroo", [("yawarda", 100, 0, language2), ("ganguru", 100, 0, language2)])
 # language3.add_meaning("kangaroo", [("marlu", 10, 0, language3)])
 # language4.add_meaning("kangaroo", [("yawarda", 10, 0, language4)])
 # language5.add_meaning("kangaroo", [("yawarda", 10, 0, language5), ("marlu", 10, 0, language5)])
@@ -773,7 +776,7 @@ socialNet.add_edge(community1, community2, weight=0.375)
 
 
 # make the model.
-testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.1)
+testingModel = DivergenceModel(languageList, communityList, socialNet, 0.6, 0.5)  #b, m
 # step the model once.
 # can be put in a loop to run many times.
 # determining number of loops and other parameters will be done by the runner script
@@ -786,8 +789,8 @@ testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.1
 # }
 
 # variable_params = {
-#     "mode": range(0.1, 1.0, 0.1),
-#     "monitoring": range(0.1, 1.0, 0.1)
+#     "mode": numpy.arange(0.0, 1.1, 0.1),
+#     "monitoring": numpy.arange(0.0, 1.1, 0.1)
 # }
 
 # batch_run = BatchRunner(
@@ -801,6 +804,7 @@ testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.1
 
 # batch_run.run_all()
 
+#for i in range(100):
 testingModel.step()
 # need a better way of dealing with the model data. it's just a dictionary containing dictionaries, which is messy.
 dataframeModel = testingModel.datacollector.get_model_vars_dataframe()
