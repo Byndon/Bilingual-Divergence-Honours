@@ -93,6 +93,7 @@ class Language:
         speaker = self.random.choice(bilinguals)
 
         # select a language to borrow from from the chosen biligual's repertoire.
+        # to fix: just take out the damn community language from the list.
         languageBorrowedFrom = self.random.choice(speaker.languageRepertoire)
         # base case, no recursion
         if(languageBorrowedFrom is not self):
@@ -211,7 +212,7 @@ class Speaker_Agent(Agent):
                         j += 1  # tally increase, another shared language is found.
                 i += j / len(langObj)  # calculate the percentage of shared languages between self and currentspeaker.
             mode += i / len(sameLangSpeakers)  # set mode to the average of repertoire.
-        elif(0 < mode and mode < 1):
+        elif(0 <= mode and mode <= 1):
             self.mode = mode
         else:
             print("something went wrong, monitoring is a value between 0 and 1.")
@@ -483,10 +484,10 @@ class Speaker_Agent(Agent):
         P_C = k_C * self.Calculate_QC_f_stbm(form, meaning, target, target, b_mode, monitor)
 
         # check for rounding error 0.99 recurring.
-        x = 10 * P_C
-        y = 9 * P_C
-        if(x - y == 1.0):
-            P_C = 1.0
+        # x = 10 * P_C
+        # y = 9 * P_C
+        # if(x - y == 1.0):
+        #     P_C = 1.0
         return(P_C)
 
     def step(self):
@@ -768,7 +769,7 @@ socialNet = nx.Graph()
 # community objects ARE the nodes in this model
 socialNet.add_nodes_from(communityList)
 # add weighted connections between the nodes.
-socialNet.add_edge(community1, community2, weight=0.375)
+socialNet.add_edge(community1, community2, weight=1)
 # socialNet.add_weighted_edges_from([
 #     (community1, community6, 0.125), (community6, community5, 0.5),
 #     (community1, community5, 0.1), (community2, community5, 0.1),pp
@@ -776,7 +777,7 @@ socialNet.add_edge(community1, community2, weight=0.375)
 
 
 # make the model.
-testingModel = DivergenceModel(languageList, communityList, socialNet, 0.6, 0.5)  #b, m
+testingModel = DivergenceModel(languageList, communityList, socialNet, 0+1e-19, 0+1e-19)  #b, m
 # step the model once.
 # can be put in a loop to run many times.
 # determining number of loops and other parameters will be done by the runner script
@@ -804,8 +805,8 @@ testingModel = DivergenceModel(languageList, communityList, socialNet, 0.6, 0.5)
 
 # batch_run.run_all()
 
-#for i in range(100):
-testingModel.step()
+for i in range(10):
+    testingModel.step()
 # need a better way of dealing with the model data. it's just a dictionary containing dictionaries, which is messy.
 dataframeModel = testingModel.datacollector.get_model_vars_dataframe()
 dataframeAgents = testingModel.datacollector.get_agent_vars_dataframe()
