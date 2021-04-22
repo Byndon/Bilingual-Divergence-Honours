@@ -26,6 +26,20 @@ def get_frequencies(model):
     return(all)  # perhaps retrn all langage dictionaries as separate variables?
 
 
+class Idiolect:
+    '''
+    This is an individiual agent's internal representation of their languages.
+    It is almost identical to the language class, in terms of the variables that it tracks,
+    but doesn't have overhead in terms of importing or borrowing, or tracking speakers.
+    '''
+    def __init__(self, languagesList):
+        self.speaker = None
+        if(type(languagesList) is list):
+            self.languages = languagesList
+        else:
+            print("Languages in idiolect are not a list: None")
+            self.languagesList = None
+
 class Language:
     '''
     A language in this model consists of a dictionary of meanings with associated forms as key values.
@@ -513,24 +527,6 @@ class Speaker_Agent(Agent):
             for form in language.formMeaningDict[meaning]:
                 allFormsForMeaning.append(form)
 
-        '''
-        print("meaning: ", meaning, "\n")
-
-
-        example output that is wrong:
-        Lizard
-        I am Agent 6, I am in community Com1, and I speak ['Language1', 'Language5', 'Language6']
-        PC_f_stbm ('wiri-wiri', 10, 4, <__main__.Language object at 0x7f73046387f0>)  p =  0.5 Language1
-        PC_f_stbm ('mirdi', 10, 3, <__main__.Language object at 0x7f73046387f0>)  p =  0.5 Language1
-        PC_f_stbm ('jindararda', 10, 2, <__main__.Language object at 0x7f72edd717b8>)  p =  0.024733768464445208 Language5
-        PC_f_stbm ('wiri-wiri', 10, 3, <__main__.Language object at 0x7f72edd717b8>)  p =  0.5 Language5
-        PC_f_stbm ('mirdi', 10, 3, <__main__.Language object at 0x7f72edd999b0>)  p =  0.5 Language6
-        PC_f_stbm ('jindararda', 10, 2, <__main__.Language object at 0x7f72edd999b0>)  p =  0.024733768464445208 Language6
-
-        Language 1 has the expected output: in L1, there is a 50-50 chance based on 2 forms having the same frequency (10)
-        L5 is wrong as it only sums to 0.5247...etc. both at the same frequency should sum to 1, but p should still be < 0.5 due to anti doppel bias, as it has a doppel in L6 (so does wiri-wiri in L1)
-        The same situation exists with L6.
-        '''
         probabilitiesList = []
         formsList = []
         likelyhoods = []
