@@ -705,7 +705,7 @@ class DivergenceModel(Model):
         # The next few list comprehensions are set up for ensuring the conditions of the simulation populations on p.275 of Ellison&Miceli 2017
         [agent.languageRepertoire.remove(language2) for agent in self.schedule.agents if agent.Community != community2 and len(agent.languageRepertoire) > 1]
         [agent.languageRepertoire.remove(language1) for agent in self.schedule.agents if agent.Community != community1 and len(agent.languageRepertoire) > 1]
-        [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1 and len(agent.languageRepertoire) > 1]
+        [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1]
         # this is where that set up ends
         for agent in self.schedule.agents:
             print("Agent:", agent.name, "| Repertoire:",
@@ -725,9 +725,9 @@ class DivergenceModel(Model):
             for meaning in language.formMeaningDict:
                 print("\t", meaning)
                 dictionaryList = []
-                # normalisingTerm = 100 / sum([form[2] for form in language.formMeaningDict[meaning]])
+                normalisingTerm = 100 / sum([form[2] for form in language.formMeaningDict[meaning]])
                 for form in language.formMeaningDict[meaning]:
-                    form = (form[0], form[2], 0 + 1e-20, form[3])
+                    form = (form[0], normalisingTerm * form[2], 0 + 1e-20, form[3])
                     print("\t\t", form[:2])
                     # don't sum old tally and the new tally. Agents should instead be re-born with the new frequencies of the last generation, rather than having an infinitely long memory. - advice from Mark
 
@@ -767,8 +767,8 @@ for eachlanguage in languageList:
     eachlanguage.formMeaningDict.clear()
 # for testing I include 2 meanings. All are 50-50 frequencies for ease,
 # and there are some doppels.
-language1.add_meaning("Lizard", [("wiri-wiri", 100, 0 + 1e-20, language1), ("mirdi", 100, 0 + 1e-20, language1)])
-language2.add_meaning("Lizard", [("wiri-wiri", 100, 0 + 1e-20, language2), ("julirri", 100, 0 + 1e-20, language2)])
+language1.add_meaning("Lizard", [("wiri-wiri", 50, 0 + 1e-20, language1), ("mirdi", 100, 0 + 1e-20, language1)])
+language2.add_meaning("Lizard", [("wiri-wiri", 50, 0 + 1e-20, language2), ("julirri", 100, 0 + 1e-20, language2)])
 # language3.add_meaning("Lizard", [("wiri-wiri", 100, 0, language3), ("mirdi", 100, 0, language3), ("marnara", 100, 0, language3)])
 # language4.add_meaning("Lizard", [("julirri", 100, 0, language4), ("jindararda", 100, 0, language4)])
 # language5.add_meaning("Lizard", [("jindararda", 100, 0, language5), ("wiri-wiri", 100, 0, language5)])
