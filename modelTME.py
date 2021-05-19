@@ -347,18 +347,31 @@ class Speaker_Agent(Agent):
         is the ratio of the relative frequency of the combination to the marginal frequency of
         using that meaning in that language (1).
         '''
+        # old code start
         # calculate the relative ferquency of the form in language for meaning
-        relativeFrequencyF = self.Calculate_R_fs_l(form, meaning, language)
+        # relativeFrequencyF = self.Calculate_R_fs_l(form, meaning, language)
 
-        # calculate the marginal frequency of using that meaning in that language.
-        marginalFrequencyList = []
+        # # calculate the marginal frequency of using that meaning in that language.
+        # marginalFrequencyList = []
+        # for form in language.formMeaningDict[meaning]:
+        #     # calculates the frequency for each form in the language
+        #     marginalFrequencyList.append(self.Calculate_R_fs_l(form, meaning, language))
+        # # sums the calculated values as in \sum_f R(f,s|l)
+        # marginalFrequency = math.fsum(marginalFrequencyList)
+
+        # return(relativeFrequencyF / marginalFrequency)
+        # old code end
+
+        #P_M(f|s;l) = \frac{N(f,s|l)}{\sum_fN(f,s|l)}
+        n_fs__l = self.Calculate_N_fs_l(form, meaning, language)
+        sum_n_fs__l_list = []
         for form in language.formMeaningDict[meaning]:
-            # calculates the frequency for each form in the language
-            marginalFrequencyList.append(self.Calculate_R_fs_l(form, meaning, language))
-        # sums the calculated values as in \sum_f R(f,s|l)
-        marginalFrequency = math.fsum(marginalFrequencyList)
+            sum_n_fs__l_list.append(self.Calculate_N_fs_l(form, meaning, language))
 
-        return(relativeFrequencyF / marginalFrequency)
+        sum_n_fs__l = math.fsum(sum_n_fs__l_list)
+
+        return(n_fs__l / sum_n_fs__l)
+    
 
     def Calculate_P2M_f_st(self, form, meaning, target):
         # Equation 2 in Ellison&Miceli 2017
@@ -773,8 +786,8 @@ for eachlanguage in languageList:
     eachlanguage.formMeaningDict.clear()
 # for testing I include 2 meanings. All are 50-50 frequencies for ease,
 # and there are some doppels.
-language1.add_meaning("Lizard", [("wiri-wiri", 5, 0 + 1e-20, language1), ("mirdi", 100, 0 + 1e-20, language1)])
-language2.add_meaning("Lizard", [("wiri-wiri", 5, 0 + 1e-20, language2), ("julirri", 100, 0 + 1e-20, language2)])
+language1.add_meaning("Lizard", [("wiri-wiri", 100, 0 + 1e-20, language1), ("mirdi", 100, 0 + 1e-20, language1)])
+language2.add_meaning("Lizard", [("wiri-wiri", 100, 0 + 1e-20, language2), ("julirri", 100, 0 + 1e-20, language2)])
 # language3.add_meaning("Lizard", [("wiri-wiri", 100, 0, language3), ("mirdi", 100, 0, language3), ("marnara", 100, 0, language3)])
 # language4.add_meaning("Lizard", [("julirri", 100, 0, language4), ("jindararda", 100, 0, language4)])
 # language5.add_meaning("Lizard", [("jindararda", 100, 0, language5), ("wiri-wiri", 100, 0, language5)])
@@ -812,7 +825,7 @@ socialNet.add_edge(community1, community2, weight=0.0)
 
 
 # make the model.
-testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.84)  #b, m
+testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 1)  #b, m
 # step the model once.
 # can be put in a loop to run many times.
 # determining number of loops and other parameters will be done by the runner script
