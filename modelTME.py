@@ -495,6 +495,7 @@ class Speaker_Agent(Agent):
         # CB: do we want to print 1.0/k_C here? 1/k_C is the inverse of the variable k_C.
         # so if k_C was 25, 1/k_C would be 0.04.
         # what is the range of values of k_C
+        # Equation 11 in Ellison&Miceli 2017
         P_C = k_C * self.Calculate_QC_f_stbm(form, meaning, target, target, b_mode, monitor)
 
         # check for rounding error 0.99 recurring.
@@ -703,9 +704,14 @@ class DivergenceModel(Model):
 
 
         # The next few list comprehensions are set up for ensuring the conditions of the simulation populations on p.275 of Ellison&Miceli 2017
+        # use only the next two lines for 10a.
         [agent.languageRepertoire.remove(language2) for agent in self.schedule.agents if agent.Community != community2 and len(agent.languageRepertoire) > 1]
         [agent.languageRepertoire.remove(language1) for agent in self.schedule.agents if agent.Community != community1 and len(agent.languageRepertoire) > 1]
-        [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1]
+        # use the following two lines in addition for 10c.
+        # [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1 and agent.name <= 75]
+        # [agent.languageRepertoire.append(language2) for agent in self.schedule.agents if agent.Community != community2 and agent.name <= 25]
+        # use the following in addition for 10b.
+        # [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1]
         # this is where that set up ends
         for agent in self.schedule.agents:
             print("Agent:", agent.name, "| Repertoire:",
@@ -767,8 +773,8 @@ for eachlanguage in languageList:
     eachlanguage.formMeaningDict.clear()
 # for testing I include 2 meanings. All are 50-50 frequencies for ease,
 # and there are some doppels.
-language1.add_meaning("Lizard", [("wiri-wiri", 50, 0 + 1e-20, language1), ("mirdi", 100, 0 + 1e-20, language1)])
-language2.add_meaning("Lizard", [("wiri-wiri", 50, 0 + 1e-20, language2), ("julirri", 100, 0 + 1e-20, language2)])
+language1.add_meaning("Lizard", [("wiri-wiri", 5, 0 + 1e-20, language1), ("mirdi", 100, 0 + 1e-20, language1)])
+language2.add_meaning("Lizard", [("wiri-wiri", 5, 0 + 1e-20, language2), ("julirri", 100, 0 + 1e-20, language2)])
 # language3.add_meaning("Lizard", [("wiri-wiri", 100, 0, language3), ("mirdi", 100, 0, language3), ("marnara", 100, 0, language3)])
 # language4.add_meaning("Lizard", [("julirri", 100, 0, language4), ("jindararda", 100, 0, language4)])
 # language5.add_meaning("Lizard", [("jindararda", 100, 0, language5), ("wiri-wiri", 100, 0, language5)])
@@ -806,7 +812,7 @@ socialNet.add_edge(community1, community2, weight=0.0)
 
 
 # make the model.
-testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 1 - 1e-20)  #b, m
+testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 0.84)  #b, m
 # step the model once.
 # can be put in a loop to run many times.
 # determining number of loops and other parameters will be done by the runner script
