@@ -117,7 +117,7 @@ class Language:
             self.borrow_form(meaning)
         # this shouldn't happen, but something might break, who knows.
         else:
-            borrowedForm = (None, 0, 0, languageBorrowedFrom)
+            borrowedForm = (None, 0, 0+1e-20, languageBorrowedFrom)
             print("something has gone wrong when borrowing a form.")
 
         # edit the borrowed form to make a new "borrowed form" tuple.
@@ -258,7 +258,8 @@ class Speaker_Agent(Agent):
         # N(f,s|l) = |\{i \in 1..n_l|S_{l,i} = (f,s)\}|
         numberOfPairings = 0
         for formString in language.formMeaningDict[meaning]:
-            if(formString[0] == form[0] and formString[3] == form[3]):
+            formItems = [i[0] for i in language.formMeaningDict[meaning]]
+            if(formString[0] == form[0] and form[0] in formItems):
                 numberOfPairings = formString[1]
                 # there shouldn't be any occurences of more
                 # than 1 of the same form for a particular meaning.
@@ -266,6 +267,7 @@ class Speaker_Agent(Agent):
         return(numberOfPairings)
 
     def Calculate_R_fs_l(self, form, meaning, language):
+        # currently unused as of 2021/20/05
         '''
         Using f for form, s for meaning, and l to denote the language, we express the relative
         frequency (R) with which a language learner hears a form-meaning combination, in the
@@ -544,11 +546,20 @@ class Speaker_Agent(Agent):
             allFormsForMeaning = []
             for language in self.languageRepertoire:
                 for form in language.formMeaningDict[meaning]:
-                    #     j_index = 0
-                    #     for i in allFormsForMeaning:
-                    #         if form[:3] is i[:3]:
-                    #            allFormsForMeaning[j_index] = (form[0],
-                    allFormsForMeaning.append(form)
+                    formStrings = [i[0] for i in allFormsForMeaning]
+                    if(form[0] in formStrings):
+                        currentForm = [i for i in allFormsForMeaning if i[0] is form[0]]
+                        currentFrequency = currentForm[0][1]
+                        averageOfFrequencies = (currentFrequency + form[1]) / 2
+                        newForm = (form[0], averageOfFrequencies)
+                        index = allFormsForMeaning.index(currentForm[0])
+                        allFormsForMeaning[index] = newForm
+                        #     j_index = 0
+                        #     for i in allFormsForMeaning:
+                        #         if form[:3] is i[:3]:
+                        #            allFormsForMeaning[j_index] = (form[0],
+                    else:
+                        allFormsForMeaning.append(form[:2])
 
             probabilitiesList = []
             formsList = []
@@ -591,9 +602,8 @@ class Speaker_Agent(Agent):
                 p = self.Calculate_PC_f_stbm(
                     form, meaning, target, target,
                     self.mode, self.monitoring)
-                # print("  PC_f_stbm", form[:3], " p = ", p, form[3].languageName)
-                # likelyhoods.append((
-                #     form, p))
+                # print("  PC_f_stbm", form, " p = ", p)
+                # likelyhoods.append((form, p))
                 # This will be summarised at the end of the loop, to facilitate more samples per agent.
                 probabilitiesList.append(p)
                 formsList.append(form)
@@ -617,15 +627,14 @@ class Speaker_Agent(Agent):
             if(x - y == 1.0):
                 sumOfTotals = 1.0
 
-            # print("\n", language.languageName, totalOfLikelyhoods, "sum = ",
-            #       sumOfTotals)
+            # print("Target = ", target.languageName, totalOfLikelyhoods, "sum = ", sumOfTotals, "\n\n")
             # this will be part of the end of step summary, to facilitate multiple samples per agent.
 
             # Here I need the agents to select a form from the distribution to produce,
             # and then +1 to the 3rd element of the form tuple (form[2]). Must reconstruct the tuple
             # because tuples are immutable.
             formProduced = self.random.choices(formsList, probabilitiesList, k=1)
-            formsProduced.append((formProduced[0][0], formProduced[0][3].languageName))
+            formsProduced.append(formProduced[0][0])
             formString = formProduced[0][0]  # first pull tuple out of list, then string out of tuple.
             # if the language produced is the community language (i.e. the target).
             # target = self.Community.communityLanguage
@@ -720,7 +729,7 @@ class DivergenceModel(Model):
         # use only the next two lines for 10a.
         [agent.languageRepertoire.remove(language2) for agent in self.schedule.agents if agent.Community != community2 and len(agent.languageRepertoire) > 1]
         [agent.languageRepertoire.remove(language1) for agent in self.schedule.agents if agent.Community != community1 and len(agent.languageRepertoire) > 1]
-        # use the following two lines in addition for 10c.
+        # # use the following two lines in addition for 10c.
         # [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1 and agent.name <= 75]
         # [agent.languageRepertoire.append(language2) for agent in self.schedule.agents if agent.Community != community2 and agent.name <= 25]
         # use the following in addition for 10b.
@@ -786,8 +795,8 @@ for eachlanguage in languageList:
     eachlanguage.formMeaningDict.clear()
 # for testing I include 2 meanings. All are 50-50 frequencies for ease,
 # and there are some doppels.
-language1.add_meaning("Lizard", [("wiri-wiri", 100, 0 + 1e-20, language1), ("mirdi", 100, 0 + 1e-20, language1)])
-language2.add_meaning("Lizard", [("wiri-wiri", 100, 0 + 1e-20, language2), ("julirri", 100, 0 + 1e-20, language2)])
+language1.add_meaning("Lizard", [("mirdi", 45, 0 + 1e-20, language1), ("wiri-wiri", 55, 0 + 1e-20, language1)])# [("wiri-wiri", 50, 0 + 1e-20, language1), ("mirdi", 50, 0 + 1e-20, language1)])
+language2.add_meaning("Lizard", [("julirri", 50, 0 + 1e-20, language2), ("wiri-wiri", 50, 0 + 1e-20, language2)])# [("wiri-wiri", 50, 0 + 1e-20, language2), ("julirri", 50, 0 + 1e-20, language2)])
 # language3.add_meaning("Lizard", [("wiri-wiri", 100, 0, language3), ("mirdi", 100, 0, language3), ("marnara", 100, 0, language3)])
 # language4.add_meaning("Lizard", [("julirri", 100, 0, language4), ("jindararda", 100, 0, language4)])
 # language5.add_meaning("Lizard", [("jindararda", 100, 0, language5), ("wiri-wiri", 100, 0, language5)])
@@ -825,7 +834,7 @@ socialNet.add_edge(community1, community2, weight=0.0)
 
 
 # make the model.
-testingModel = DivergenceModel(languageList, communityList, socialNet, 0.54, 1)  #b, m
+testingModel = DivergenceModel(languageList, communityList, socialNet, .5, .8)  #b, m
 # step the model once.
 # can be put in a loop to run many times.
 # determining number of loops and other parameters will be done by the runner script
