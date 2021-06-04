@@ -26,11 +26,22 @@ def get_frequencies(model):
     return(all)  # perhaps retrn all langage dictionaries as separate variables?
 
 
+def get_frequencies_table(language):
+    dictionaryOfFreq = {}
+    for meaning in language.formMeaningDict:
+        for form in language.formMeaningDict[meaning]:
+            dictionaryOfFreq[str(form[0] + ":" + meaning)] = form[1]
+
+    return(dictionaryOfFreq)
+
+
 class Idiolect:
     '''
     This is an individiual agent's internal representation of their languages.
     It is almost identical to the language class, in terms of the variables that it tracks,
     but doesn't have overhead in terms of importing or borrowing, or tracking speakers.
+
+    Currently not in use
     '''
     def __init__(self, languagesList):
         self.speaker = None
@@ -135,8 +146,7 @@ class Language:
         # need to figure out the randomness before implementing.
         for meaning in self.formMeaningDict:
             for form in self.formMeaningDict[meaning]:
-                formFrequency = self.calc_form_frequency(form, meaning)
-                if(formFrequency < lossLimit):
+                if(form[1] < lossLimit):
                     # find the tuple that is "form" and delete it from the
                     # value list for the key "meaning".
                     oldList = self.formMeaningDict[meaning]
@@ -544,22 +554,31 @@ class Speaker_Agent(Agent):
             # and the language to which it belongs.
 
             allFormsForMeaning = []
+            doppelDict = {}
             for language in self.languageRepertoire:
                 for form in language.formMeaningDict[meaning]:
                     formStrings = [i[0] for i in allFormsForMeaning]
                     if(form[0] in formStrings):
                         currentForm = [i for i in allFormsForMeaning if i[0] is form[0]]
                         currentFrequency = currentForm[0][1]
-                        averageOfFrequencies = (currentFrequency + form[1]) / 2
-                        newForm = (form[0], averageOfFrequencies)
-                        index = allFormsForMeaning.index(currentForm[0])
-                        allFormsForMeaning[index] = newForm
-                        #     j_index = 0
-                        #     for i in allFormsForMeaning:
-                        #         if form[:3] is i[:3]:
-                        #            allFormsForMeaning[j_index] = (form[0],
+                        if(form[0] not in doppelDict):
+                            doppelDict[form[0]] = [currentFrequency, form[1]]
+                        else:
+                            doppelDict[form[0]].append(form[1])
+
+                        # averageOfFrequencies = (currentFrequency + form[1]) / 2
+                        # newForm = (form[0], averageOfFrequencies)
+                        # index = allFormsForMeaning.index(currentForm[0])
+                        # allFormsForMeaning[index] = newForm
                     else:
                         allFormsForMeaning.append(form[:2])
+
+            for entry in doppelDict:
+                average = math.fsum(doppelDict[entry]) / len(doppelDict[entry])
+                newForm = (entry, average)
+                indexingList = [i[0] for i in allFormsForMeaning]
+                index = indexingList.index(entry)
+                allFormsForMeaning[index] = newForm
 
             probabilitiesList = []
             formsList = []
@@ -603,7 +622,7 @@ class Speaker_Agent(Agent):
                     form, meaning, target, target,
                     self.mode, self.monitoring)
                 # print("  PC_f_stbm", form, " p = ", p)
-                # likelyhoods.append((form, p))
+                likelyhoods.append((form, p))
                 # This will be summarised at the end of the loop, to facilitate more samples per agent.
                 probabilitiesList.append(p)
                 formsList.append(form)
@@ -633,9 +652,19 @@ class Speaker_Agent(Agent):
             # Here I need the agents to select a form from the distribution to produce,
             # and then +1 to the 3rd element of the form tuple (form[2]). Must reconstruct the tuple
             # because tuples are immutable.
-            formProduced = self.random.choices(formsList, probabilitiesList, k=1)
-            formsProduced.append(formProduced[0][0])
-            formString = formProduced[0][0]  # first pull tuple out of list, then string out of tuple.
+            
+            formsProduced = self.random.choices(formsList, probabilitiesList, k=100)
+            formList = []
+            [formList.append(i[0]) for i in formsProduced]
+            
+
+            # next two lines were commented out for chages in optimistation
+            # formsProduced.append(formProduced[0][0])
+            # formString = formProduced[0][0]  # first pull tuple out of list, then string out of tuple.
+            # previous 2 lines are what is being edited.
+
+
+                
             # if the language produced is the community language (i.e. the target).
             # target = self.Community.communityLanguage
             '''
@@ -645,16 +674,16 @@ class Speaker_Agent(Agent):
             dictionaryList = []
             # i think there is a problem here. Diachronically the doppel gets and enormous boost due to maintaining multiple different tallies and probably adding each.
             # the problem might not be here.
-
-            for form in target.formMeaningDict[meaning]:
-                if(formString == form[0]):
-                    # if the form is from another language, but is a doppel with the target, update
-                    form = (form[0], form[1], form[2] + 1, form[3])
-                    # need to put this form into the list value for the key in the dict.
-                else:
-                    form = form
-                dictionaryList.append(form)
-                # print(form)
+            for formString in formList:
+                for form in target.formMeaningDict[meaning]:
+                    if(formString == form[0]):
+                        # if the form is from another language, but is a doppel with the target, update
+                        form = (form[0], form[1], form[2] + 1, form[3])
+                        # need to put this form into the list value for the key in the dict.
+                    else:
+                        form = form
+                    dictionaryList.append(form)
+                    # print(form)
             target.formMeaningDict[meaning] = dictionaryList
         '''
         print("\n\tSTEP END\n")
@@ -663,6 +692,10 @@ class Speaker_Agent(Agent):
         #     self.name, self.Community.communityName, str(
         #         [language.languageName for language in self.languageRepertoire])))
         # print(formsProduced)
+        for language in languageList:
+            for meaning in language.formMeaningDict:
+                for form in language.formMeaningDict[meaning]:
+                    print(form[:2])
 
 class DivergenceModel(Model):
     def __init__(self, languageObjectList, communityObjectList, network, mode=False, monitoring=False, seed=12345):
@@ -733,7 +766,7 @@ class DivergenceModel(Model):
         # [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1 and agent.name <= 75]
         # [agent.languageRepertoire.append(language2) for agent in self.schedule.agents if agent.Community != community2 and agent.name <= 25]
         # use the following in addition for 10b.
-        # [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1]
+        [agent.languageRepertoire.append(language1) for agent in self.schedule.agents if agent.Community != community1]
         # this is where that set up ends
         for agent in self.schedule.agents:
             print("Agent:", agent.name, "| Repertoire:",
@@ -741,7 +774,7 @@ class DivergenceModel(Model):
                   "| Community:", agent.Community.communityName)
         self.datacollector = DataCollector(
             model_reporters={"Frequencies": get_frequencies},
-            agent_reporters={"Last Meaning": "lastMeaning"}
+            agent_reporters={"mode": "mode", "monitoring": "monitoring"}
         )
 
     def step(self):
@@ -749,14 +782,14 @@ class DivergenceModel(Model):
         self.schedule.step()
         # increase the tally based on how many times each form was prodcued by an agent
         for language in self.languages:
-            print(language.languageName)
+            # print(language.languageName)
             for meaning in language.formMeaningDict:
-                print("\t", meaning)
+                # print("\t", meaning)
                 dictionaryList = []
                 normalisingTerm = 100 / sum([form[2] for form in language.formMeaningDict[meaning]])
                 for form in language.formMeaningDict[meaning]:
                     form = (form[0], normalisingTerm * form[2], 0 + 1e-20, form[3])
-                    print("\t\t", form[:2])
+                    # print("\t\t", form[:2])
                     # don't sum old tally and the new tally. Agents should instead be re-born with the new frequencies of the last generation, rather than having an infinitely long memory. - advice from Mark
 
                     dictionaryList.append(form)
@@ -787,7 +820,7 @@ language2 = Language("Language2")
 # language6 = Language("Language6")
 
 # make a list of the languages to give to the model.
-languageList = [language1, language2]  #, language3, language4, language5, language6]
+languageList = [language1, language2]  # , language3]  # , language4, language5, language6]
 
 # input some meanings and forms into the languages
 for eachlanguage in languageList:
@@ -802,8 +835,8 @@ language2.add_meaning("Lizard", [("julirri", 50, 0 + 1e-20, language2), ("wiri-w
 # language5.add_meaning("Lizard", [("jindararda", 100, 0, language5), ("wiri-wiri", 100, 0, language5)])
 # language6.add_meaning("Lizard", [("mirdi", 100, 0, language6), ("jindararda", 100, 0, language6)])
 
-# language1.add_meaning("kangaroo", [("yawarda", 100, 0, language1), ("marlu", 100, 0, language1)])
-# language2.add_meaning("kangaroo", [("yawarda", 100, 0, language2), ("ganguru", 100, 0, language2)])
+language1.add_meaning("kangaroo", [("yawarda", 50, 0 + 1e-20, language1), ("marlu", 50, 0 + 1e-20, language1)])
+language2.add_meaning("kangaroo", [("yawarda", 55, 0 + 1e-20, language2), ("ganguru", 45, 0 + 1e-20, language2)])
 
 # language3.add_meaning("kangaroo", [("marlu", 100, 0, language3)])
 # language4.add_meaning("kangaroo", [("yawarda", 100, 0, language4)])
@@ -812,22 +845,22 @@ language2.add_meaning("Lizard", [("julirri", 50, 0 + 1e-20, language2), ("wiri-w
 
 # define the communities to which agent's can belong.
 # this determines which language they speak natively.
-community1 = Community("Com1", language1, 50)
-community2 = Community("Com2", language2, 50)
-# community3 = Community("Com3", language3, 10)
+community1 = Community("Com1", language1, 10)
+community2 = Community("Com2", language2, 10)
+# community3 = Community("Com3", language3, 50)
 # community4 = Community("Com4", language4, 10)
 # community5 = Community("Com5", language5, 10)
 # community6 = Community("Com6", language6, 10)
 
-communityList = [community1, community2]  # , community3, community4, community5, community6]
+communityList = [community1, community2]  # , community3]  #, community4, community5, community6]
 # create network
 socialNet = nx.Graph()
 # create nodes from list of community objects
 # community objects ARE the nodes in this model
 socialNet.add_nodes_from(communityList)
 # add weighted connections between the nodes.
-socialNet.add_edge(community1, community2, weight=0.0)
-# socialNet.add_weighted_edges_from([
+# socialNet.add_edge(community1, community2, weight=0.0)
+socialNet.add_weighted_edges_from([(community1, community2, 0.125)])  #, (community2, community3, 0.5)])
 #     (community1, community6, 0.125), (community6, community5, 0.5),
 #     (community1, community5, 0.1), (community2, community5, 0.1),
 #     (community6, community4, 0.01), (community2, community4, 0.4)])
@@ -861,9 +894,13 @@ testingModel = DivergenceModel(languageList, communityList, socialNet, .5, .8)  
 # )
 
 # batch_run.run_all()
-
+stepCounter = 0
 for i in range(35):
     testingModel.step()
-# need a better way of dealing with the model data. it's just a dictionary containing dictionaries, which is messy.
+    if(stepCounter % 5 == 0):
+        for language in languageList:
+            language.lose_form(5.0)
+        
+    # need a better way of dealing with the model data. it's just a dictionary containing dictionaries, which is messy.
 dataframeModel = testingModel.datacollector.get_model_vars_dataframe()
 dataframeAgents = testingModel.datacollector.get_agent_vars_dataframe()
