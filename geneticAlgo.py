@@ -73,14 +73,13 @@ def run_model(model, steps, lossLimit):
     # this is then returned as the individualLexicalDifference
 
 
-def fitness_function(individual, weight, steps, lossLimit):
+def fitness_function(individual, weight, steps, lossLimit, networkSpecifier, languageList, communityList, fitnessComparisonList):
     # this function needs to call the simulation, building it with the specified community network edges parameters (the genes),
-    model = mdl.build_model(individual, weight)  # builds the model to have the appropriate genes asigned to where they are meant to be
+    model = mdl.build_model(individual, weight, networkSpecifier, languageList, communityList)  # builds the model to have the appropriate genes asigned to where they are meant to be
 
     # and store the lexical difference from the simulation in a list
     # call the simulation and it should return a list of lexical differences based on the calculation to this variable (type list)
     individualLexicalDifference = run_model(model, steps, lossLimit)  # call the simulation to run.
-    fitnessComparisonList = [0.5, 0.6, 0.7, 0.3, 0.4, 0.5, 0.8]  # this list is a list of the lexical difference measures between pairs of languages (predetermined). Only differences between connected nodes are considered. 7 genes with 6 languages
 
     for lexical_diff in individualLexicalDifference:
         # get the difference between the measures of lexical difference (calculated and pre-determined)
@@ -174,14 +173,42 @@ def mutate(listOfOffspring):
 # after this I need to add my mutants and the successful reproducers back into the pool to run the simulation again. Huzzah
 
 
-def run_sim(listOfIndividuals, weight, steps, lossLimit):
+def run_sim(listOfIndividuals, weight, steps, lossLimit, networkSpecifier, languageList, communityList, fitnessComparisonList):
     # this function takes a list of individuals (chromosomes) and runs the simulation over each one.
     fitList = []
     for individual in listOfIndividuals:
-        fitness = fitness_function(individual, weight, steps, lossLimit)
+        fitness = fitness_function(individual, weight, steps, lossLimit, networkSpecifier, languageList, communityList, fitnessComparisonList)
         fitList.append((individual, fitness))
 
     return(fitList)
+
+
+def main(populationList, generations, weight, steps, lossLimit, networkSpecifier, languageList, communityList, fitnessComparisonList):
+    # to run the program without the genetic algorithm component, just set the generations variable to 1
+    # networkSpecifier indicates which network the simulations should be building.
+    for i in range(generations):
+        # run the simulation to get the fitness levels of each chromosome
+        assessedIndividuals = run_sim(populationList, weight, steps, lossLimit, networkSpecifier, languageList, communityList, fitnessComparisonList)
+
+        # pprint.pprint(assessedIndividuals)
+        # select some individuals primarily based on fitness, and pair them for reproduction
+        pairTuples = selection(assessedIndividuals, 4)
+        # generate offspring with a number of genes crossed over from each parent
+        offspringList = crossover(pairTuples)
+        # add mutations into the chromosomes to stimulate genetic diversity.
+        mutants = mutate(offspringList)
+        # add the children to the population along with their parents to try again
+        # as well as 2 randomly defined individuals to increase genetic diversity further
+        randomIndividual1, randomIndividual2 = [round(random.uniform(0, 1), 2) for i in range(2)], [round(random.uniform(0, 1), 2) for i in range(2)]
+        parents1 = [i[0] for i in pairTuples]
+        parents2 = [i[1] for i in pairTuples]
+        populationList.clear()
+        populationList = [i for i in mutants]
+        populationList.append(randomIndividual1)
+        populationList.append(randomIndividual2)
+        populationList.extend(parents1)
+        populationList.extend(parents2)
+        # need a way to optimise this a bit. avoid recalculating the fitness of the parent generation (reduces the number of sims to run by 4 per generation.
 
 # this is where I make the genetic algo do its thing
 # initialise a population of individuals/chromosomes (7 genes)
@@ -210,32 +237,85 @@ previousPopulation = [[round(random.uniform(0, 1), 2) for i in range(2)],
                       [round(random.uniform(0, 1), 2) for i in range(2)],
                       [round(random.uniform(0, 1), 2) for i in range(2)]]
 
+# create languages (from mdl.Language class)
+# ensure the languages exist.
+language1 = mdl.Language("Ngarigu")
+language2 = mdl.Language("Thawa")
+language3 = mdl.Language("Bidhawal")
+language4 = mdl.Language("Thangguai")
+language5 = mdl.Language("Muk-Thang")
+language6 = mdl.Language("Dhudhuroa")
+language7 = mdl.Language("Nulit")
+language8 = mdl.Language("Pallanganmiddang")
+language9 = mdl.Language("Kurnai")
+language10 = mdl.Language("Yorta Yorta")
+language11 = mdl.Language("Yabula Yabula")
+language12 = mdl.Language("Woiwurrung")
+language13 = mdl.Language("Boonwurrung")
+language14 = mdl.Language("Daungwurrung")
+language15 = mdl.Language("Wathawurrung")
+language16 = mdl.Language("Djabwurrung")
+language17 = mdl.Language("Djadjala")
+language18 = mdl.Language("Wemba Wemba")
+language19 = mdl.Language("Baraba Baraba")
+language20 = mdl.Language("Nari Nari")
+language21 = mdl.Language("Madhi Madhi")
+language22 = mdl.Language("Yitha Yitha")
+language23 = mdl.Language("Wadi Wadi")
+language24 = mdl.Language("yari Yari")
+language25 = mdl.Language("Keramin")
+language26 = mdl.Language("Ladji Ladji")
+language27 = mdl.Language("Ngintait")
+language28 = mdl.Language("Wotjobaluk")
+language29 = mdl.Language("Jardwadjali")
+language30 = mdl.Language("Kolakngat")
+language31 = mdl.Language("Warrnambool")
+language32 = mdl.Language("Buwandik")
+language33 = mdl.Language("Ngarkat")
+language34 = mdl.Language("Ngarrindjeri")
 
-def main(populationList, generations, weight, steps, lossLimit, networkSpecifier):
-    # to run the program without the genetic algorithm component, just set the generations variable to 1
-    # networkSpecifier indicates which network the simulations should be building.
-    for i in range(generations):
-        # run the simulation to get the fitness levels of each chromosome
-        assessedIndividuals = run_sim(populationList, weight, steps, lossLimit, networkSpecifier)
+# make a list of the languages to give to the model.
+languageList = [language1, language2, language3, language4, language5, language6, language7, language8, language9, language10, language11, language12, language13, language14, language15, language16, language17, language18, language19, language20, language21, language22, language23, language24, language25, language26, language27, language28, language29, language30, language31, language32, language33, language34]
 
-        # pprint.pprint(assessedIndividuals)
-        # select some individuals primarily based on fitness, and pair them for reproduction
-        pairTuples = selection(assessedIndividuals, 4)
-        # generate offspring with a number of genes crossed over from each parent
-        offspringList = crossover(pairTuples)
-        # add mutations into the chromosomes to stimulate genetic diversity.
-        mutants = mutate(offspringList)
-        # add the children to the population along with their parents to try again
-        # as well as 2 randomly defined individuals to increase genetic diversity further
-        randomIndividual1, randomIndividual2 = [round(random.uniform(0, 1), 2) for i in range(2)], [round(random.uniform(0, 1), 2) for i in range(2)]
-        parents1 = [i[0] for i in pairTuples]
-        parents2 = [i[1] for i in pairTuples]
-        populationList.clear()
-        populationList = [i for i in mutants]
-        populationList.append(randomIndividual1)
-        populationList.append(randomIndividual2)
-        populationList.extend(parents1)
-        populationList.extend(parents2)
-        # need a way to optimise this a bit. avoid recalculating the fitness of the parent generation (reduces the number of sims to run by 4 per generation.
 
-main(populationList, 20, 0.4, 35, 1.0)
+# define the communities to which agent's can belong.
+# this determines which language they speak natively.
+community1 = mdl.Community(language1.languageName, language1, 10)
+community2 = mdl.Community(language2.languageName, language1, 10)
+community3 = mdl.Community(language3.languageName, language3, 10)
+community4 = mdl.Community(language4.languageName, language4, 10)
+community5 = mdl.Community(language5.languageName, language5, 10)
+community6 = mdl.Community(language6.languageName, language6, 10)
+community7 = mdl.Community(language7.languageName, language7, 10)
+community8 = mdl.Community(language8.languageName, language8, 10)
+community9 = mdl.Community(language9.languageName, language9, 10)
+community10 = mdl.Community(language10.languageName, language10, 10)
+community11 = mdl.Community(language11.languageName, language11, 10)
+community12 = mdl.Community(language12.languageName, language12, 10)
+community13 = mdl.Community(language13.languageName, language13, 10)
+community14 = mdl.Community(language14.languageName, language14, 10)
+community15 = mdl.Community(language15.languageName, language15, 10)
+community16 = mdl.Community(language16.languageName, language16, 10)
+community17 = mdl.Community(language17.languageName, language17, 10)
+community18 = mdl.Community(language18.languageName, language18, 10)
+community19 = mdl.Community(language19.languageName, language19, 10)
+community20 = mdl.Community(language20.languageName, language20, 10)
+community21 = mdl.Community(language21.languageName, language21, 10)
+community22 = mdl.Community(language22.languageName, language22, 10)
+community23 = mdl.Community(language23.languageName, language23, 10)
+community24 = mdl.Community(language24.languageName, language24, 10)
+community25 = mdl.Community(language25.languageName, language25, 10)
+community26 = mdl.Community(language26.languageName, language26, 10)
+community27 = mdl.Community(language27.languageName, language27, 10)
+community28 = mdl.Community(language28.languageName, language28, 10)
+community29 = mdl.Community(language29.languageName, language29, 10)
+community30 = mdl.Community(language30.languageName, language30, 10)
+community31 = mdl.Community(language31.languageName, language31, 10)
+community32 = mdl.Community(language32.languageName, language32, 10)
+community33 = mdl.Community(language33.languageName, language33, 10)
+community34 = mdl.Community(language34.languageName, language34, 10)
+
+communityList = [community1, community2, community3, community4, community5, community6, community7, community8, community9, community10, community11, community12, community13, community14, community15, community16, community17, community18, community19, community20, community21, community22, community23, community24, community25, community26, community27, community28, community29, community30, community31, community32, community33, community34]
+
+
+main(populationList, 1, 1, 35, 1.0, 1, languageList, communityList, [0.5])

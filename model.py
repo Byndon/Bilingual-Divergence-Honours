@@ -18,8 +18,8 @@ class Language:
     '''
 
     # a language has a name, a form-meaning dictionary, and a list of speakers.
-    def __init__(self, languageName):
-        self.languageName = languageName
+    def __init__(self, Name):
+        self.languageName = Name
         self.formMeaningDict = {}
         self.speakers = []
 
@@ -120,6 +120,7 @@ class Language:
                         # this is basically impossible to trigger, as if somebody only has one option, they will hav to use it to express the associated meaning and it will be 100% by default.
                         self.borrow_form(meaning)
 
+
 class Community:
     '''
     A community is a grouping of speakers.
@@ -141,6 +142,7 @@ class Community:
 
     def list_members(self):
         print(self.communityMembers)
+
 
 class Speaker_Agent(Agent):
     '''
@@ -339,16 +341,15 @@ class Speaker_Agent(Agent):
         # return(relativeFrequencyF / marginalFrequency)
         # old code end
 
-        #P_M(f|s;l) = \frac{N(f,s|l)}{\sum_fN(f,s|l)}
-        n_fs__l = self.Calculate_N_fs_l(form, meaning, language)
-        sum_n_fs__l_list = []
+        # P_M(f|s;l) = \frac{N(f,s|l)}{\sum_fN(f,s|l)}
+        n_fs_l = self.Calculate_N_fs_l(form, meaning, language)
+        sum_n_fs_l_list = []
         for form in language.formMeaningDict[meaning]:
-            sum_n_fs__l_list.append(self.Calculate_N_fs_l(form, meaning, language))
+            sum_n_fs_l_list.append(self.Calculate_N_fs_l(form, meaning, language))
 
-        sum_n_fs__l = math.fsum(sum_n_fs__l_list)
+        sum_n_fs_l = math.fsum(sum_n_fs_l_list)
 
-        return(n_fs__l / sum_n_fs__l)
-
+        return(n_fs_l / sum_n_fs_l)
 
     def Calculate_P2M_f_st(self, form, meaning, target):
         # Equation 2 in Ellison&Miceli 2017
@@ -496,12 +497,22 @@ class Speaker_Agent(Agent):
         return(P_C)
 
     def step(self):
+        '''
+        Idea for improving speed of steps.
+        - Maintain a list of the known permutations of languageRepertoires
+        - If an agent with a repertoire that is already in the list (in any order) is processed
+        - use the already calculated probabilities for each form and meaning.
+        - If not, calculate the probabilities for each meaning and save them to a list,
+        - along with the permutation of repertoire associated with them.
+        - select a bunch of meanings as usual, then chose the forms based on probability
+
+        - pros: might be faster overall, cos it'll have to do a maximum of the number of unique repertoires
+        - cons: might end up slower for some individual agents' steps.
+        '''
         # make a list of meanings
         meanings = [i for i in self.L1.formMeaningDict]
-        # make probabilites such that each form is equally likely to be selected for production
-        probabilities = [1 for i in meanings]
         # select 100 random meanings from the list of meanings
-        chooseMeanings = self.random.choices(meanings, probabilities, k=100)
+        chooseMeanings = self.random.choices(meanings, weights=None, k=100)
         # ensure the list of chosen forms is unique
         chooseMeanings = list(np.unique(chooseMeanings))
 
@@ -517,7 +528,7 @@ class Speaker_Agent(Agent):
                 for form in language.formMeaningDict[meaning]:
                     formStrings = [i[0] for i in allFormsForMeaning]
                     if(form[0] in formStrings):
-                        currentForm = [i for i in allFormsForMeaning if i[0] is form[0]]
+                        currentForm = [i for i in allFormsForMeaning if i[0] == form[0]]
                         currentFrequency = currentForm[0][1]
                         if(form[0] not in doppelDict):
                             doppelDict[form[0]] = [currentFrequency, form[1]]
@@ -614,8 +625,8 @@ class DivergenceModel(Model):
             weightOfCommunityL1 = 1
             # the weight of the community will always be 1 (highest weight)
             weights.append(weightOfCommunityL1)
-            normalisingTerm = 1 / math.fsum(weights)  # calculate nromalising term
-            newWeights = [normalisingTerm * i for i in weights]
+            # normalisingTerm = 1 / math.fsum(weights)  # calculate nromalising term
+            # newWeights = [normalisingTerm * i for i in weights]
             # use normalising term to determine relative weights.
             # weightOfCommunityL1 = 1 - math.fsum([i[1] for i in communityConnections])  # OLD 
             # weightOfCommunityL1 =  # no longer needed as we are calculating the weights differently.
@@ -624,37 +635,50 @@ class DivergenceModel(Model):
 
             for population in range(community.communitySize):
                 # returns a list of the choices. This list is a single value as only 1 choice is being made.
-                communityOfL1 = self.random.choices([i[0] for i in communityConnections],
-                                                    newWeights, k=1)  # weights was [j[1] for j in communityConnections] #restore to newWeights after testing 07-05-21: done
+                # communityOfL1 = self.random.choices([i[0] for i in communityConnections],
+                #                                     newWeights, k=1)  # weights was [j[1] for j in communityConnections] #restore to newWeights after testing 07-05-21: done
                 # take the 0th item in the list (the language object) and select this as the l1.
-                agentL1 = communityOfL1[0].communityLanguage
+                agentL1 = community.communityLanguage
                 speaker = Speaker_Agent(currentPopulation, self, agentL1, mode, monitoring)
                 community.add_members(speaker)
                 speaker.define_community(community)
                 # make the agent speak the community language, if it is not their l1
-                if(speaker.L1 is not community.communityLanguage):
-                    speaker.language_repertoire_add(community.communityLanguage)
-                # determine how many languages the agent can speak
-                nodeDegree = network.degree(community)
-                startValue = 0.6
-                numberOfLanguagesSpoken = self.random.choices(
-                    [i + 1 for i in range(nodeDegree)],
-                    np.linspace(startValue, startValue / (100 * startValue), num=nodeDegree), k=1)
-                # [0.6, 0.5, 0.4, 0.3, 0.2, 0.1], k=1)  # has to be same number of these as number of languages, or else it has errors in random library.
+                # if(speaker.L1 is not community.communityLanguage):
+                #     speaker.language_repertoire_add(community.communityLanguage)
+                # # determine how many languages the agent can speak
+                # nodeDegree = network.degree(community)
+                # startValue = 0.6
+                # numberOfLanguagesSpoken = self.random.choices(
+                #     [i + 1 for i in range(nodeDegree)],
+                #     np.linspace(startValue, startValue / (100 * startValue), num=nodeDegree), k=1)
+                # # [0.6, 0.5, 0.4, 0.3, 0.2, 0.1], k=1)  # has to be same number of these as number of languages, or else it has errors in random library.
 
-                if(len(communityConnections) > 1
-                   and numberOfLanguagesSpoken[0] > len(speaker.languageRepertoire)):
-                    currentNumberOfLanguages = len(speaker.languageRepertoire)
-                    for i in sorted(communityConnections, key=lambda x: x[1]):
-                        if(i[0].communityLanguage not in
-                           speaker.languageRepertoire
-                           and currentNumberOfLanguages <= numberOfLanguagesSpoken[0]):
-                            speaker.language_repertoire_add(i[0].communityLanguage)
-                            currentNumberOfLanguages += 1
+                # if(len(communityConnections) > 1
+                #    and numberOfLanguagesSpoken[0] > len(speaker.languageRepertoire)):
+                #     currentNumberOfLanguages = len(speaker.languageRepertoire)
+                #     for i in sorted(communityConnections, key=lambda x: x[1]):
+                #         if(i[0].communityLanguage not in
+                #            speaker.languageRepertoire
+                #            and currentNumberOfLanguages <= numberOfLanguagesSpoken[0]):
+                #             speaker.language_repertoire_add(i[0].communityLanguage)
+                #             currentNumberOfLanguages += 1
                 self.schedule.add(speaker)
                 currentPopulation += 1
-
-
+        
+        # add new languages for agents based on weighting
+        for community in communityObjectList:
+            # get the current community's connections and their weights from the list of edges.
+            # communities without any connections return an empty list
+            # this particular list comprehension returns a list of tuples but strips the tuple of the current community for convenience.
+            communityConnections = [tuple(elem for elem in sub if elem != community) for sub in
+                                    list(network.edges.data("weight")) if community in sub]
+            for edge in communityConnections:
+                randomAgents = self.random.sample(community.communityMembers, k=math.floor(len(community.communityMembers) * edge[1]))
+                [True for i in randomAgents if i in community.communityMembers]
+                for agent in randomAgents:
+                    if(edge[0] not in agent.languageRepertoire):
+                        agent.language_repertoire_add(edge[0].communityLanguage)
+                
         # The next few list comprehensions are set up for ensuring the conditions of the simulation populations on p.275 of Ellison&Miceli 2017
         # use only the next two lines for 10a.
         # [agent.languageRepertoire.remove(self.languages[1]) for agent in self.schedule.agents if agent.Community != communityObjectList[1] and len(agent.languageRepertoire) > 1]        
@@ -713,47 +737,9 @@ class DivergenceModel(Model):
         #             print(form[:2], language.languageName)
         #     language.lose_form(20.0)
         # print("step end")
+        print("model stepped")
 
 
-# ensure the languages exist.
-language1 = Language("Ngarigu")
-language2 = Language("Thawa")
-language3 = Language("Bidhawal")
-language4 = Language("Thangguai")
-language5 = Language("Muk-Thang")
-language6 = Language("Dhudhuroa")
-language7 = Language("Nulit")
-language8 = Language("Pallanganmiddang")
-language9 = Language("Kurnai")
-language10 = Language("Yorta Yorta")
-language11 = Language("Yabula Yabula")
-language12 = Language("Woiwurrung")
-language13 = Language("Boonwurrung")
-language14 = Language("Daungwurrung")
-language15 = Language("Wathawurrung")
-language16 = Language("Djabwurrung")
-language17 = Language("Djadjala")
-language18 = Language("Wemba Wemba")
-language19 = Language("Baraba Baraba")
-language20 = Language("Nari Nari")
-language21 = Language("Madhi Madhi")
-language22 = Language("Yitha Yitha")
-language23 = Language("Wadi Wadi")
-language24 = Language("yari Yari")
-language25 = Language("Keramin")
-language26 = Language("Ladji Ladji")
-language27 = Language("Ngintait")
-language28 = Language("Wotjobaluk")
-language29 = Language("Jardwadjali")
-language30 = Language("Kolakngat")
-language31 = Language("Warrnambool")
-language32 = Language("Buwandik")
-language33 = Language("Ngarkat")
-language34 = Language("Ngarrindjeri")
-
-
-# make a list of the languages to give to the model.
-languageList = [language1, language2, language3, language4, language5, language6, language7, language8, language9, language10, language11, language12, language13, language14, language15, language16, language17, language18, language19, language20, language21, language22, language23, language24, language25, language26, language27, language28, language29, language30, language31, language32, language33, language34]
 
 # input some meanings and forms into the languages
 # for eachlanguage in languageList:
@@ -765,6 +751,7 @@ languageList = [language1, language2, language3, language4, language5, language6
 # this data was used during testing
 # language1.add_meaning("Lizard", ([("wiri-wiri", 50, 0, language1), ("mirdi", 50, 0, language1)]))
 # language2.add_meaning("Lizard", ([("wiri-wiri", 50, 0, language2), ("marnara", 50, 0, language2)]))
+
 # language3.add_meaning("Lizard", ([("wiri-wiri", 50, 0, language3), ("mirdi", 50, 0, language3), ("marnara", 50, 0, language3)]))
 # language4.add_meaning("Lizard", ([("julirri", 50, 0, language4), ("jindararda", 50, 0, language4)]))
 # language5.add_meaning("Lizard", ([("jindararda", 50, 0, language5), ("wiri-wiri", 50, 0, language5)]))
@@ -777,132 +764,74 @@ languageList = [language1, language2, language3, language4, language5, language6
 # language5.add_meaning("kangaroo", ([("yawarda", 50, 0, language5), ("marlu", 50, 0, language5)]))
 # language6.add_meaning("kangaroo", ([("marlu", 50, 0, language6)]))
 
-# define the communities to which agent's can belong.
-# this determines which language they speak natively.
-community1 = Community(language1.languageName, language1, 10)
-community2 = Community(language2.languageName, language1, 10)
-community3 = Community(language3.languageName, language3, 10)
-community4 = Community(language4.languageName, language4, 10)
-community5 = Community(language5.languageName, language5, 10)
-community6 = Community(language6.languageName, language6, 10)
-community7 = Community(language7.languageName, language7, 10)
-community8 = Community(language8.languageName, language8, 10)
-community9 = Community(language9.languageName, language9, 10)
-community10 = Community(language10.languageName, language10, 10)
-community11 = Community(language11.languageName, language11, 10)
-community12 = Community(language12.languageName, language12, 10)
-community13 = Community(language13.languageName, language13, 10)
-community14 = Community(language14.languageName, language14, 10)
-community15 = Community(language15.languageName, language15, 10)
-community16 = Community(language16.languageName, language16, 10)
-community17 = Community(language17.languageName, language17, 10)
-community18 = Community(language18.languageName, language18, 10)
-community19 = Community(language19.languageName, language19, 10)
-community20 = Community(language20.languageName, language20, 10)
-community21 = Community(language21.languageName, language21, 10)
-community22 = Community(language22.languageName, language22, 10)
-community23 = Community(language23.languageName, language23, 10)
-community24 = Community(language24.languageName, language24, 10)
-community25 = Community(language25.languageName, language25, 10)
-community26 = Community(language26.languageName, language26, 10)
-community27 = Community(language27.languageName, language27, 10)
-community28 = Community(language28.languageName, language28, 10)
-community29 = Community(language29.languageName, language29, 10)
-community30 = Community(language30.languageName, language30, 10)
-community31 = Community(language31.languageName, language31, 10)
-community32 = Community(language32.languageName, language32, 10)
-community33 = Community(language33.languageName, language33, 10)
-community34 = Community(language34.languageName, language34, 10)
 
-communityList = [community1, community2, community3, community4, community5, community6, community7, community8, community9, community10, community11, community12, community13, community14, community15, community16, community17, community18, community19, community20, community21, community22, community23, community24, community25, community26, community27, community28, community29, community30, community31, community32, community33, community34]
-# create network
-# socialNet = nx.Graph()
-socialNet = nx.readwrite.graphml.read_graphml("./inputs/bordergraph.graphml")
-# socialNet1 = nx.readwrite.graphml.read_graphml("")  # 2 node network
-# socialNet2 = nx.readwrite.graphml.read_graphml("")  # 3 node network
-# socialNet3 = nx.readwrite.graphml.read_graphml("")  # 5 node network
-
-# create nodes from list of community objects
-# community objects ARE the nodes in this model
-# socialNet.add_nodes_from(communityList)
+def setDictValues(language):
+    for meaning in language.formMeaningDict:
+        language.formMeaningDict[meaning] = [(i.replace("/", "").strip(), 1 / len(language.formMeaningDict[meaning]), 0, language) for i in language.formMeaningDict[meaning]]
 
 
-
-# socialNet.add_weighted_edges_from([(community1, community2, weight),
-#                                    (community2, community4, weight),
-#                                    (community1, community5, weight),
-#                                    (community2, community3, weight),
-#                                    (community4, community6, weight),
-#                                    (community5, community3, weight),
-#                                    (community3, community6, weight)]
-# )
-
-# print(socialNet.nodes)
-# pos = nx.planar_layout(socialNet)
-# options = {
-#     "width": 4,
-#     "edge_cmap": plt.cm.viridis,
-#     "edge_vmin": float(0),
-#     "edge_vmax": float(1),
-#     "labels": {key: key.communityName for key in socialNet.nodes}
-# }
-
-# # show the network structure
-# nx.draw_networkx(socialNet, pos, **options)
-# nx.draw_networkx_edge_labels(socialNet, pos, edge_labels=nx.get_edge_attributes(socialNet, "weight"))
-# plt.show()
-
-# remap nodes to be their objects, instead of references to the number on the graphml
-# mapping = {: key for key in communityList}
-mapping = {}
-mapCount = 1
-for i in communityList:
-    mapping[str(mapCount)] = i
-    mapCount += 1
-
-socialNet = nx.relabel_nodes(socialNet, mapping)
-
-
-def setDictValues(community):
-    for meaning in community.communityLanguage.formMeaningDict:
-        community.communityLanguage.formMeaningDict[meaning] = [(i.replace("/", "").strip(), 1 / len(community.communityLanguage.formMeaningDict[meaning]), 0, community.communityLanguage) for i in community.communityLanguage.formMeaningDict[meaning]]
-
-
-def build_model(individual, weight):
-    # add weighted connections between the nodes.
-    [nx.set_edge_attributes(socialNet, weight, "weight") for i in socialNet.edges()]
-
+def build_model(individual, weight, networkSpecifier, languageList, communityList):
     # set the dictionaries to be equal to their respective language groups.
-    for community in communityList:
-        if(community.communityLanguage.languageName in lac.KulinLanguages):
-            community.communityLanguage.formMeaningDict = copy.deepcopy(lac.kulinDict)
+    for language in languageList:
+        if(language.languageName in lac.KulinLanguages):
+            language.formMeaningDict = copy.deepcopy(lac.kulinDict)
             # set the dictionary values to have the appropriate list of tuple structures (form, frequency, current usage, languageObject)
-            setDictValues(community)
-        if(community.communityLanguage.languageName in lac.LowerMurrayLanguages):
-            community.communityLanguage.formMeaningDict = copy.deepcopy(lac.lowMurrayDict)
-            setDictValues(community)
-        if(community.communityLanguage.languageName in lac.YuinLanguages):
-            community.communityLanguage.formMeaningDict = copy.deepcopy(lac.yuinDict)
-            setDictValues(community)
-        if(community.communityLanguage.languageName in lac.VictorianOtherLanguages):
-            community.communityLanguage.formMeaningDict = copy.deepcopy(lac.vicDict)
-            setDictValues(community)
+            setDictValues(language)
+        elif(language.languageName in lac.LowerMurrayLanguages):
+            language.formMeaningDict = copy.deepcopy(lac.lowMurrayDict)
+            setDictValues(language)
+        elif(language.languageName in lac.YuinLanguages):
+            language.formMeaningDict = copy.deepcopy(lac.yuinDict)
+            setDictValues(language)
+        elif(language.languageName in lac.VictorianOtherLanguages):
+            language.formMeaningDict = copy.deepcopy(lac.vicDict)
+            setDictValues(language)
     # outNetwork = nx.relabel_nodes(socialNet, mapping)
 
-    # write the network structure to a file
-    # make a filename for the network structure based on current time.
-    # filestr = "graphout/" + time.strftime("%Y%m%d-%H%M%S") + ".gml"
-    # nx.write_gml(outNetwork, filestr)
+    # use selected network, based on networkSpecifier
+    if(networkSpecifier == 0):
+        pass
+
+    elif(networkSpecifier == 1):
+        # network 2-nodes
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/graph-bb-ww.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[17:19]
+        inputCommunityList = communityList[17:19]
+
+        # limit the considered meanings to a single form.
+        inputLanguageList[0].formMeaningDict = {"possum": inputLanguageList[0].formMeaningDict["possum"]}
+        inputLanguageList[1].formMeaningDict = {"possum": inputLanguageList[1].formMeaningDict["possum"]}
+
+    elif(networkSpecifier == 2):
+        # network 3 nodes
+        pass
+    elif(networkSpecifier == 3):
+        # network, 5 nodes
+        pass
+
+    # relabel nodes
+    mapping = {}
+    mapCount = 1
+    for i in communityList:
+        mapping[str(mapCount)] = i
+        mapCount += 1
+
+    socialNet = nx.relabel_nodes(socialNet, mapping)
+    # add weighted connections between the nodes.
+    [nx.set_edge_attributes(socialNet, weight, "weight") for i in socialNet.edges()]
 
     mode = individual[0]
     monitoring = individual[1]
     # make the model.
-    model = DivergenceModel(languageList, communityList, socialNet, mode, monitoring)  # mode, monitoring
+    model = DivergenceModel(inputLanguageList, inputCommunityList, socialNet, mode, monitoring)  # mode, monitoring
     return(model)
 
 
-individual = [0.7, 0.6]
-model = build_model(individual, 0.4)
+# individual = [0.7, 0.6]
+# model = build_model(individual, 0.2, 1, genal.languageList, genal.communityList)
+# model.step()
 # stepCounter = 0
 # for i in range(35):
 #     # print(str(stepCounter))

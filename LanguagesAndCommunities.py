@@ -8,7 +8,7 @@ listOfDicts = [kulinDict, yuinDict, lowMurrayDict, vicDict]
 
 
 def defineLists():
-    KulinLanguages = ["Woiwurrung", "Boonwurrung", "Daungwurrung", "Wathawurrung", "Djabwurrung", "Djadjawurrung", "Wemba-Wemba", "Baraba Baraba", "Nari Nari", "Madhi Madhi", "Wadi-wadi", "Yari Yari", "Ladji-Ladji", "Wotjobaluk", "Jardwadjali", "Kolakngat", "Warrnambool", "Buwandik", "Djadjala", "Werkaya", "Tjapwurrung"]
+    KulinLanguages = ["Woiwurrung", "Boonwurrung", "Daungwurrung", "Wathawurrung", "Djabwurrung", "Djadjawurrung", "Wemba Wemba", "Baraba Baraba", "Nari Nari", "Madhi Madhi", "Wadi-wadi", "Yari Yari", "Ladji-Ladji", "Wotjobaluk", "Jardwadjali", "Kolakngat", "Warrnambool", "Buwandik", "Djadjala", "Werkaya", "Tjapwurrung"]
     YuinLanguages = ["Thawa", "Ngarigu", "Gundungurra", "Moneroo"]
     LowerMurrayLanguages = ["Ngarrindjeri", "Ngarkat", "Ngintait", "Keramin", "Yitha-Yitha"]
     VictorianOtherLanguages = ["Muk-Thang", "Thangguai", "Bidhawal", "Dhudhuroa", "Nulit", "Pallanganmiddang", "Kurnai", "Yorta-Yorta", "Yabula-Yabula"]
@@ -74,4 +74,4 @@ def main(csvfile, listOfLanguages):
 
 
 KulinLanguages, YuinLanguages, LowerMurrayLanguages, VictorianOtherLanguages = defineLists()
-main("Vicdata_minimal_conv.csv", [KulinLanguages, YuinLanguages, LowerMurrayLanguages, VictorianOtherLanguages])
+main("Vicdata_minimal_.csv", [KulinLanguages, YuinLanguages, LowerMurrayLanguages, VictorianOtherLanguages])
