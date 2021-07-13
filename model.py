@@ -5,7 +5,7 @@ import math
 import numpy as np
 import copy
 import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
-# import pprint
+import pprint
 import LanguagesAndCommunities as lac
 
 
@@ -177,6 +177,7 @@ class Speaker_Agent(Agent):
         self.L1 = L1
         self.Community = None
         self.lastMeaning = "Nothing"
+        self.model = model
 
     def language_repertoire_add(self, language):
         if(type(language) is Language):
@@ -238,7 +239,7 @@ class Speaker_Agent(Agent):
             formItems = [i[0] for i in language.formMeaningDict[meaning]]
             if(formString[0] == form[0] and form[0] in formItems):
                 numberOfPairings = formString[1]
-                # there shouldn't be any occurences of more
+                # there shouldn't be any occurences of more, should be able to break here
                 # than 1 of the same form for a particular meaning.
             # there was a break here
         return(numberOfPairings)
@@ -509,62 +510,76 @@ class Speaker_Agent(Agent):
         - pros: might be faster overall, cos it'll have to do a maximum of the number of unique repertoires
         - cons: might end up slower for some individual agents' steps.
         '''
+        # make a choice to use a pre-calculated repertoire
+        # repertoireDictionaryKey = [i for i in self.model.dictionaryOfRepertoires.keys()
+        #                            if((i[0] == self.languageRepertoire[0])
+        #                               and (set(i) == set(self.languageRepertoire)))]
+        # repertoireDictionaryKey = repertoireDictionaryKey[0]
+        
+        repertoireDictionaryKey = hash(tuple((self.languageRepertoire[0], *tuple(set(self.languageRepertoire[1:])))))
+
         # make a list of meanings
         meanings = [i for i in self.L1.formMeaningDict]
-        # select 100 random meanings from the list of meanings
+        # select 100 random meanings from the list of meanings, with equal probability
         chooseMeanings = self.random.choices(meanings, weights=None, k=100)
+
         # ensure the list of chosen forms is unique
-        chooseMeanings = list(np.unique(chooseMeanings))
+        uniqueMeanings = list(np.unique(chooseMeanings))
 
         # define the target to be communityLanguage
         target = self.Community.communityLanguage
         # next step is to calculate probabilities for forms belonging to the meanings selected
-        dictOfProbabilities = {}
-        for meaning in chooseMeanings:
-            allFormsForMeaning = []
-            doppelDict = {}
-            # ensure doppels are unique in the caclulations
-            for language in self.languageRepertoire:
-                for form in language.formMeaningDict[meaning]:
-                    formStrings = [i[0] for i in allFormsForMeaning]
-                    if(form[0] in formStrings):
-                        currentForm = [i for i in allFormsForMeaning if i[0] == form[0]]
-                        currentFrequency = currentForm[0][1]
-                        if(form[0] not in doppelDict):
-                            doppelDict[form[0]] = [currentFrequency, form[1]]
+
+        for meaning in uniqueMeanings:
+            repertoireOfInterest = self.model.dictionaryOfRepertoires[repertoireDictionaryKey]
+            if(meaning not in repertoireOfInterest.keys()):
+                allFormsForMeaning = []
+                doppelDict = {}
+                # ensure doppels are unique in the caclulations
+                for language in self.languageRepertoire:
+                    for form in language.formMeaningDict[meaning]:
+                        formStrings = [i[0] for i in allFormsForMeaning]
+                        if(form[0] in formStrings):
+                            currentForm = [i for i in allFormsForMeaning if i[0] == form[0]]
+                            currentFrequency = currentForm[0][1]
+                            if(form[0] not in doppelDict):
+                                doppelDict[form[0]] = [currentFrequency, form[1]]
+                            else:
+                                doppelDict[form[0]].append(form[1])
+
+                            # averageOfFrequencies = (currentFrequency + form[1]) / 2
+                            # newForm = (form[0], averageOfFrequencies)
+                            # index = allFormsForMeaning.index(currentForm[0])
+                            # allFormsForMeaning[index] = newForm
                         else:
-                            doppelDict[form[0]].append(form[1])
+                            allFormsForMeaning.append(form[:2])
+                # doppels need to be avaerage scores of the doppel form over all the agent's languages.
+                for entry in doppelDict:
+                    average = math.fsum(doppelDict[entry]) / len(doppelDict[entry])
+                    newForm = (entry, average)
+                    indexingList = [i[0] for i in allFormsForMeaning]
+                    index = indexingList.index(entry)
+                    allFormsForMeaning[index] = newForm
+                
+                likelyhoods = []
+                for form in allFormsForMeaning:
+                    p = self.Calculate_PC_f_stbm(
+                        form, meaning, target, target,
+                        self.mode, self.monitoring)
+                    likelyhoods.append((form, p))
 
-                        # averageOfFrequencies = (currentFrequency + form[1]) / 2
-                        # newForm = (form[0], averageOfFrequencies)
-                        # index = allFormsForMeaning.index(currentForm[0])
-                        # allFormsForMeaning[index] = newForm
-                    else:
-                        allFormsForMeaning.append(form[:2])
-            # doppels need to be avaerage scores of the doppel form over all the agent's languages.
-            for entry in doppelDict:
-                average = math.fsum(doppelDict[entry]) / len(doppelDict[entry])
-                newForm = (entry, average)
-                indexingList = [i[0] for i in allFormsForMeaning]
-                index = indexingList.index(entry)
-                allFormsForMeaning[index] = newForm
+                # dictOfProbabilities[meaning] = likelyhoods
+                repertoireOfInterest[meaning] = likelyhoods
 
-            likelyhoods = []
-            for form in allFormsForMeaning:
-                p = self.Calculate_PC_f_stbm(
-                    form, meaning, target, target,
-                    self.mode, self.monitoring)
-                likelyhoods.append((form, p))
-
-            dictOfProbabilities[meaning] = likelyhoods
-
-        for i in range(100):
+        # using the predefined list of meanings as the agent's choice of words, select a form to produce for each meaning in the list.
+        # forms are weighted by their probability, as calculated by Calculate_PC_f_stbm.
+        for meaning in chooseMeanings:
             dictionaryList = []
-            meaning = self.random.choice(list(dictOfProbabilities))
-            formsAndPs = dictOfProbabilities[meaning]
+            formsAndPs = self.model.dictionaryOfRepertoires[repertoireDictionaryKey][meaning]
             formChosenAsList = self.random.choices([i[0][0] for i in formsAndPs],
                                                    [i[1] for i in formsAndPs], k=1)
             formChosenString = formChosenAsList[0]
+            # print(formChosenString)
             for form in target.formMeaningDict[meaning]:
                 if(formChosenString == form[0]):
                     form = (form[0], form[1], form[2] + 1, form[3])
@@ -573,7 +588,9 @@ class Speaker_Agent(Agent):
                 dictionaryList.append(form)
             target.formMeaningDict[meaning] = dictionaryList
 
-        # pprint.pprint(target.formMeaningDict)
+        print(target.languageName)
+        pprint.pprint(formsAndPs)
+        pprint.pprint(target.formMeaningDict)
 
 
 def collect_frequencies(model):
@@ -599,8 +616,10 @@ class DivergenceModel(Model):
         self.schedule = RandomActivation(self)
         self.model_population = sum([community.communitySize for community in communityObjectList])
         self.languages = languageObjectList
+        self.communities = communityObjectList
         self.languageNames = [i.languageName for i in self.languages]
-
+        self.dictionaryOfRepertoires = {}
+ 
         # initialise the column names for the tables
         allForms = []
         for language in self.languages:
@@ -611,28 +630,34 @@ class DivergenceModel(Model):
         self.languageDict = {key: allForms for key in self.languageNames}
         self.network = network
         self.running = True
+        self.mode = mode
+        self.monitoring = monitoring
 
         currentPopulation = 0
-        for community in communityObjectList:
-            # get the current community's connections and their weights from the list of edges.
-            # communities without any connections return an empty list
-            # this particular list comprehension returns a list of tuples but strips the tuple of the current community for convenience.
-            communityConnections = [tuple(elem for elem in sub if elem != community) for sub in
-                                    list(network.edges.data("weight")) if community in sub]
-            # calculate the weight of the native community l1
-            # need to normalise this to conserve weights.
-            weights = [i[1] for i in communityConnections]
-            weightOfCommunityL1 = 1
-            # the weight of the community will always be 1 (highest weight)
-            weights.append(weightOfCommunityL1)
-            # normalisingTerm = 1 / math.fsum(weights)  # calculate nromalising term
-            # newWeights = [normalisingTerm * i for i in weights]
-            # use normalising term to determine relative weights.
-            # weightOfCommunityL1 = 1 - math.fsum([i[1] for i in communityConnections])  # OLD 
-            # weightOfCommunityL1 =  # no longer needed as we are calculating the weights differently.
-            # include this in the possible choices for assigning a language.
-            communityConnections.append((community, weightOfCommunityL1))
+        # for community in communityObjectList:
+        #     # get the current community's connections and their weights from the list of edges.
+        #     # communities without any connections return an empty list
+        #     # this particular list comprehension returns a list of tuples but strips the tuple of the current community for convenience.
+        #     communityConnections = [tuple(elem for elem in sub if elem != community) for sub in
+        #                             list(network.edges.data("weight")) if community in sub]
+        #     # calculate the weight of the native community l1
+        #     # need to normalise this to conserve weights.
+        #     weights = [i[1] for i in communityConnections]
+        #     weightOfCommunityL1 = 1
+        #     # the weight of the community will always be 1 (highest weight)
+        #     weights.append(weightOfCommunityL1)
+        #     # normalisingTerm = 1 / math.fsum(weights)  # calculate nromalising term
+        #     # newWeights = [normalisingTerm * i for i in weights]
+        #     # use normalising term to determine relative weights.
+        #     # weightOfCommunityL1 = 1 - math.fsum([i[1] for i in communityConnections])  # OLD
+        #     # weightOfCommunityL1 =  # no longer needed as we are calculating the weights differently.
+        #     # include this in the possible choices for assigning a language.
+        #     communityConnections.append((community, weightOfCommunityL1))
 
+
+
+        # add new languages for agents based on weighting
+        for community in communityObjectList:
             for population in range(community.communitySize):
                 # returns a list of the choices. This list is a single value as only 1 choice is being made.
                 # communityOfL1 = self.random.choices([i[0] for i in communityConnections],
@@ -664,21 +689,23 @@ class DivergenceModel(Model):
                 #             currentNumberOfLanguages += 1
                 self.schedule.add(speaker)
                 currentPopulation += 1
-        
-        # add new languages for agents based on weighting
-        for community in communityObjectList:
             # get the current community's connections and their weights from the list of edges.
             # communities without any connections return an empty list
             # this particular list comprehension returns a list of tuples but strips the tuple of the current community for convenience.
-            communityConnections = [tuple(elem for elem in sub if elem != community) for sub in
-                                    list(network.edges.data("weight")) if community in sub]
+            # communityConnections = [tuple(elem for elem in sub if elem != community) for sub in
+            #                         list(network.edges.data("weight")) if community in sub]
+            communityConnections = []
+            communityDict = dict(network.__getitem__(community))
+            for i in communityDict:
+                communityConnections.append((i, communityDict[i]["weight"]))
+
             for edge in communityConnections:
                 randomAgents = self.random.sample(community.communityMembers, k=math.floor(len(community.communityMembers) * edge[1]))
                 [True for i in randomAgents if i in community.communityMembers]
                 for agent in randomAgents:
                     if(edge[0] not in agent.languageRepertoire):
                         agent.language_repertoire_add(edge[0].communityLanguage)
-                
+
         # The next few list comprehensions are set up for ensuring the conditions of the simulation populations on p.275 of Ellison&Miceli 2017
         # use only the next two lines for 10a.
         # [agent.languageRepertoire.remove(self.languages[1]) for agent in self.schedule.agents if agent.Community != communityObjectList[1] and len(agent.languageRepertoire) > 1]        
@@ -699,9 +726,29 @@ class DivergenceModel(Model):
                   ",".join([lang.languageName for lang in agent.languageRepertoire]),
                   "| Community:", agent.Community.communityName)
 
+            repertoireKey = ""
+            if(len(agent.languageRepertoire) > 1):
+                # if the L1 followed by any permutation of the other languages is already in the dictionary it doesn't need to be added as a key
+                # if not, add it as a key. Only the fact that the languages after L1 are in the tuple is important, not the ordering.
+                # L1 matters as L1 is the target language the agent will be speaking, and thus this will affect the calculations.
+                # the distinction is binary Target or Non-Target so the ordering of the rest don't matter.
+                # get the current keys from the dicteonary that have the same first language as the current agent's repertoire
+                # currentKeys = [i for i in self.dictionaryOfRepertoires.keys() if i[0] == agent.languageRepertoire[0]]
+                # if there are not sets that contain the rest of the languages in the repertoi
+                if(hash(tuple((agent.languageRepertoire[0], *tuple(set(agent.languageRepertoire[1:]))))) not in self.dictionaryOfRepertoires):
+                    
+                    # set(agent.languageRepertoire[1:]) not in [set(i[1:]) for i in currentKeys if len(i) > 1]
+                    # code block for above if statement begins here
+                    repertoireKey = hash(tuple((agent.languageRepertoire[0], *tuple(set(agent.languageRepertoire[1:])))))
+                    self.dictionaryOfRepertoires[repertoireKey] = dict([(1,2)])
+            elif((len(agent.languageRepertoire) == 1) and (hash(tuple(agent.languageRepertoire)) not in self.dictionaryOfRepertoires.keys())):
+                repertoireKey = hash(tuple((agent.languageRepertoire[0], *tuple(set(agent.languageRepertoire[1:])))))
+                self.dictionaryOfRepertoires[repertoireKey] = dict([(3,4)])
+        pprint.pprint(self.dictionaryOfRepertoires)
+
         self.datacollector = DataCollector(
             model_reporters={"Frequencies": collect_frequencies},
-            tables=self.languageDict  #{"L1Forms": [k[0] for i in self.languages[0].formMeaningDict for k in self.languages[0].formMeaningDict[i]]}
+            tables=self.languageDict  # {"L1Forms": [k[0] for i in self.languages[0].formMeaningDict for k in self.languages[0].formMeaningDict[i]]}
         )
 
     def step(self):
@@ -738,7 +785,9 @@ class DivergenceModel(Model):
         #     language.lose_form(20.0)
         # print("step end")
         print("model stepped")
-
+        print(self.dictionaryOfRepertoires)
+        for i in self.dictionaryOfRepertoires:
+            self.dictionaryOfRepertoires[i].clear()
 
 
 # input some meanings and forms into the languages
@@ -767,10 +816,12 @@ class DivergenceModel(Model):
 
 def setDictValues(language):
     for meaning in language.formMeaningDict:
-        language.formMeaningDict[meaning] = [(i.replace("/", "").strip(), 1 / len(language.formMeaningDict[meaning]), 0, language) for i in language.formMeaningDict[meaning]]
+        language.formMeaningDict[meaning] = [(i.replace("/", "").strip(), 1 / len(language.formMeaningDict[meaning]), 0+1e-20, language) for i in language.formMeaningDict[meaning]]
 
 
 def build_model(individual, weight, networkSpecifier, languageList, communityList):
+    for language in languageList:
+        language.formMeaningDict.clear()
     # set the dictionaries to be equal to their respective language groups.
     for language in languageList:
         if(language.languageName in lac.KulinLanguages):
@@ -801,8 +852,10 @@ def build_model(individual, weight, networkSpecifier, languageList, communityLis
         inputCommunityList = communityList[17:19]
 
         # limit the considered meanings to a single form.
-        inputLanguageList[0].formMeaningDict = {"possum": inputLanguageList[0].formMeaningDict["possum"]}
-        inputLanguageList[1].formMeaningDict = {"possum": inputLanguageList[1].formMeaningDict["possum"]}
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", 50, 0+1e-20, languageList[17]), ("walert", 50, 0+1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", 50, 0+1e-20, languageList[18]), ("garibal", 50, 0+1e-20, languageList[18])]
 
     elif(networkSpecifier == 2):
         # network 3 nodes
@@ -829,9 +882,9 @@ def build_model(individual, weight, networkSpecifier, languageList, communityLis
     return(model)
 
 
-# individual = [0.7, 0.6]
-# model = build_model(individual, 0.2, 1, genal.languageList, genal.communityList)
-# model.step()
+# individual = [0.54, 0.84]
+# model = build_model(individual, 0.2, 1, languageList, communityList)
+# # model.step()
 # stepCounter = 0
 # for i in range(35):
 #     # print(str(stepCounter))
@@ -864,3 +917,6 @@ def build_model(individual, weight, networkSpecifier, languageList, communityLis
 # plt.xlabel("step")
 # plt.legend()
 # plt.show()
+
+
+
