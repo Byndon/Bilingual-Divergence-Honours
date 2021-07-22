@@ -4,6 +4,7 @@ import random
 import numpy
 import math
 import csv
+import networkx as nx
 # import pprint
 # import matplotlib.pyplot as plt
 
@@ -19,7 +20,7 @@ def invert(x):
 
 
 def run_model(model, steps, lossLimit):
-    print((model.mode, model.monitoring))
+    # print((model.mode, model.monitoring))
     stepCounter = 0
     for i in range(steps):
         model.step()
@@ -51,7 +52,7 @@ def run_model(model, steps, lossLimit):
         # calculate the percentage of items that are shared between the two lists.
         perCentShared = len(sharedForms) / (totalL1Forms + totalL2Forms)
         sharedVocabPerCents.append(perCentShared)  # also should have which edges they are for spotting issues
-    
+
     listOfTables = [(i.languageName, model.datacollector.get_table_dataframe(i.languageName), i) for i in model.languages]
     for i in listOfTables:
         # make a filename
@@ -59,9 +60,9 @@ def run_model(model, steps, lossLimit):
         # write out csv files for each langauge.
         with open(filename, 'a+') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(("Chromosome", i[2].speakers[0].mode, i[2].speakers[0].monitoring))
+            writer.writerow(("Chromosome", i[2].speakers[0].mode, i[2].speakers[0].monitoring, "Network Weights", [i for i in dict(nx.get_edge_attributes(model.network, "weight")).values()][0]))
             i[1].to_csv(csvfile, mode="a")
-        
+
     # print([type(i[1]) for i in listOfTables])
     # pprint.pprint(listOfTables)
     # for i in listOfTables:
@@ -80,7 +81,7 @@ def fitness_function(individual, weight, steps, lossLimit, networkSpecifier, lan
     model = None
     model = mdl.build_model(individual, weight, networkSpecifier, languageList, communityList)
     # builds the model to have the appropriate genes asigned to where they are meant to be
-    print((model.mode, model.monitoring))
+    # print((model.mode, model.monitoring))
 
     # and store the lexical difference from the simulation in a list
     # call the simulation and it should return a list of lexical differences based on the calculation to this variable (type list)
@@ -105,11 +106,10 @@ def selection(listOfIndividuals, numberToSelect):
     chosenListIndices = numpy.random.choice(len(chromosomeList), size=4, replace=False, p=normProbOfSelection)
     chosenList = [chromosomeList[i] for i in chosenListIndices]
 
-
     # pair individuals
     random.shuffle(chosenList)
-    list1 = chosenList[:int(len(chosenList)/2)]  # first half of list
-    list2 = chosenList[int(len(chosenList)/2):]  # second half of list
+    list1 = chosenList[:int(len(chosenList) / 2)]  # first half of list
+    list2 = chosenList[int(len(chosenList) / 2):]  # second half of list
     pairTuples = list(zip(list1, list2))
 
     return(pairTuples)
@@ -123,7 +123,7 @@ def crossover(pairTuples):
         mAlpha = pair[0]
         dAlpha = pair[1]
         # choose how many genes will be crossed, less likely to cross more genes.
-        lstChoices = [i+1 for i in range(lengthOfChromosome)]
+        lstChoices = [i + 1 for i in range(lengthOfChromosome)]
         numberOfCrossedGenes = random.choices(lstChoices, lstChoices.reverse(), k=1)
         numberOfCrossedGenes = numberOfCrossedGenes[0]
 
@@ -189,7 +189,7 @@ def run_sim(listOfIndividuals, weight, steps, lossLimit, networkSpecifier, fitne
         # make a list of the languages to give to the model.
         # define the communities to which agent's can belong.
         communityList = lac.build_communitiesList(languageList)
-        
+
         fitness = fitness_function(individual, weight, steps, lossLimit, networkSpecifier, languageList, communityList, fitnessComparisonList)
         fitList.append((individual, fitness))
 
@@ -226,7 +226,6 @@ def main(populationList, generations, weight, steps, lossLimit, networkSpecifier
         populationList.extend(parents1)
         populationList.extend(parents2)
 
-
         # need a way to optimise this a bit. avoid recalculating the fitness of the parent generation (reduces the number of sims to run by 4 per generation.
 
 # this is where I make the genetic algo do its thing
@@ -258,5 +257,8 @@ previousPopulation = [[round(random.uniform(0, 1), 2) for i in range(2)],
 
 
 customPopulation = [[0.54, 0.84], [0.01, 0.99], [0.99, 0.01], [0.01, 0.01], [0.99, 0.99], [0.5, 0.5], [0.25, 0.75], [0.75, 0.25], [0.33, 0.66], [0.66, 0.33]]
- 
-main(customPopulation, 1, 1, 35, 1.0, 1, [0.5])
+
+for i in [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 1.0]:
+    main(customPopulation, 1, i, 35, 1.0, 11, [0.5])
+    customPopulation = [[0.54, 0.84], [0.01, 0.99], [0.99, 0.01], [0.01, 0.01], [0.99, 0.99], [0.5, 0.5], [0.25, 0.75], [0.75, 0.25], [0.33, 0.66], [0.66, 0.33]]
+# main([[0.54, 0.84]], 1, 0.5, 35, 1.0, "10b", [0.5])

@@ -5,7 +5,7 @@ import math
 import numpy as np
 import copy
 import networkx as nx  # used for connecting communtiy agents. Maybe used for connecting agents in large numbers in a more complex simulation.
-import pprint
+# import pprint
 import LanguagesAndCommunities as lac
 
 
@@ -30,6 +30,7 @@ class Language:
         # relative frequency should be a parameter
         # if we have enough information, BUT
         # can also be randomly determined.
+        # this has been relegated to a seperate file: LanguagesAndCommunities.py
         pass
 
     def add_meaning(self, meaning, formTupleList):
@@ -91,7 +92,7 @@ class Language:
             self.borrow_form(meaning)
         # this shouldn't happen, but something might break, who knows.
         else:
-            borrowedForm = (None, 0, 0+1e-20, languageBorrowedFrom)
+            borrowedForm = (None, 0, 0 + 1e-20, languageBorrowedFrom)
             print("something has gone wrong when borrowing a form.")
 
         # edit the borrowed form to make a new "borrowed form" tuple.
@@ -214,6 +215,7 @@ class Speaker_Agent(Agent):
             self.monitoring = self.random.uniform(0, 1)
         if monitoring is True:
             # determine monitoring based on others in the community
+            # Don't know how monitoring would be affected by the composition of the community as a whole.
             pass
         else:
             if(0 <= monitoring and monitoring <= 1):
@@ -225,6 +227,7 @@ class Speaker_Agent(Agent):
         # meanings are the keys for the dictionary
         # I use L1 (the first language in the repertoire list)
         # out of convenience. All languages can express the same meanings.
+        # This method is no longer used.
 
         # make a random choice from a list of the dictionary keys.
         meaningChosen = self.random.choice(list(self.languageRepertoire[0].formMeaningDict.keys()))
@@ -304,7 +307,6 @@ class Speaker_Agent(Agent):
         #     for forms in language.formMeaningDict[meanings]:
         #         summationListF.append(self.Calculate_N_fs_l(forms, meanings, language))
         #     summationListS.append(math.fsum(summationListF))
-
 
         # sum the frequencies for each language to get a total frequency
         # of occurence for the specific form in all the agent's languages.
@@ -418,7 +420,7 @@ class Speaker_Agent(Agent):
 
         k_L = self.Calculate_k_L(form, meaning)
         CardinalityOfL = len(self.languageRepertoire)
-        PM = self.Calculate_PM_f_sl(form, meaning, target)  # pass target instead of language. No need for language argument. 
+        PM = self.Calculate_PM_f_sl(form, meaning, target)  # pass target instead of language. No need for language argument.
         return(monitor * k_L * PM + (1 - monitor) / CardinalityOfL)
 
     def Calculate_QC_f_stbm(self, form, meaning, language, target, b_mode, monitor):
@@ -515,7 +517,7 @@ class Speaker_Agent(Agent):
         #                            if((i[0] == self.languageRepertoire[0])
         #                               and (set(i) == set(self.languageRepertoire)))]
         # repertoireDictionaryKey = repertoireDictionaryKey[0]
-        
+
         repertoireDictionaryKey = hash(tuple((self.languageRepertoire[0], *tuple(set(self.languageRepertoire[1:])))))
 
         # make a list of meanings
@@ -560,7 +562,7 @@ class Speaker_Agent(Agent):
                     indexingList = [i[0] for i in allFormsForMeaning]
                     index = indexingList.index(entry)
                     allFormsForMeaning[index] = newForm
-                
+
                 likelyhoods = []
                 for form in allFormsForMeaning:
                     p = self.Calculate_PC_f_stbm(
@@ -588,9 +590,9 @@ class Speaker_Agent(Agent):
                 dictionaryList.append(form)
             target.formMeaningDict[meaning] = dictionaryList
 
-        print(target.languageName)
-        pprint.pprint(formsAndPs)
-        pprint.pprint(target.formMeaningDict)
+        # print(target.languageName)
+        # pprint.pprint(formsAndPs)
+        # pprint.pprint(target.formMeaningDict)
 
 
 def collect_frequencies(model):
@@ -619,7 +621,7 @@ class DivergenceModel(Model):
         self.communities = communityObjectList
         self.languageNames = [i.languageName for i in self.languages]
         self.dictionaryOfRepertoires = {}
- 
+
         # initialise the column names for the tables
         allForms = []
         for language in self.languages:
@@ -653,8 +655,6 @@ class DivergenceModel(Model):
         #     # weightOfCommunityL1 =  # no longer needed as we are calculating the weights differently.
         #     # include this in the possible choices for assigning a language.
         #     communityConnections.append((community, weightOfCommunityL1))
-
-
 
         # add new languages for agents based on weighting
         for community in communityObjectList:
@@ -708,7 +708,7 @@ class DivergenceModel(Model):
 
         # The next few list comprehensions are set up for ensuring the conditions of the simulation populations on p.275 of Ellison&Miceli 2017
         # use only the next two lines for 10a.
-        # [agent.languageRepertoire.remove(self.languages[1]) for agent in self.schedule.agents if agent.Community != communityObjectList[1] and len(agent.languageRepertoire) > 1]        
+        # [agent.languageRepertoire.remove(self.languages[1]) for agent in self.schedule.agents if agent.Community != communityObjectList[1] and len(agent.languageRepertoire) > 1]
         # [agent.languageRepertoire.remove(self.languages[0]) for agent in self.schedule.agents if agent.Community != communityObjectList[0] and len(agent.languageRepertoire) > 1]
         # use the following two lines in addition for 10c.
         # [agent.languageRepertoire.append(self.languages[0]) for agent in self.schedule.agents if agent.Community != communityObjectList[0] and agent.name <= 75]
@@ -736,15 +736,15 @@ class DivergenceModel(Model):
                 # currentKeys = [i for i in self.dictionaryOfRepertoires.keys() if i[0] == agent.languageRepertoire[0]]
                 # if there are not sets that contain the rest of the languages in the repertoi
                 if(hash(tuple((agent.languageRepertoire[0], *tuple(set(agent.languageRepertoire[1:]))))) not in self.dictionaryOfRepertoires):
-                    
+
                     # set(agent.languageRepertoire[1:]) not in [set(i[1:]) for i in currentKeys if len(i) > 1]
                     # code block for above if statement begins here
                     repertoireKey = hash(tuple((agent.languageRepertoire[0], *tuple(set(agent.languageRepertoire[1:])))))
-                    self.dictionaryOfRepertoires[repertoireKey] = dict([(1,2)])
+                    self.dictionaryOfRepertoires[repertoireKey] = dict([(1, 2)])
             elif((len(agent.languageRepertoire) == 1) and (hash(tuple(agent.languageRepertoire)) not in self.dictionaryOfRepertoires.keys())):
                 repertoireKey = hash(tuple((agent.languageRepertoire[0], *tuple(set(agent.languageRepertoire[1:])))))
-                self.dictionaryOfRepertoires[repertoireKey] = dict([(3,4)])
-        pprint.pprint(self.dictionaryOfRepertoires)
+                self.dictionaryOfRepertoires[repertoireKey] = dict([(3, 4)])
+        # pprint.pprint(self.dictionaryOfRepertoires)
 
         self.datacollector = DataCollector(
             model_reporters={"Frequencies": collect_frequencies},
@@ -784,8 +784,8 @@ class DivergenceModel(Model):
         #             print(form[:2], language.languageName)
         #     language.lose_form(20.0)
         # print("step end")
-        print("model stepped")
-        print(self.dictionaryOfRepertoires)
+        # print("model stepped")
+        # print(self.dictionaryOfRepertoires)
         for i in self.dictionaryOfRepertoires:
             self.dictionaryOfRepertoires[i].clear()
 
@@ -816,7 +816,7 @@ class DivergenceModel(Model):
 
 def setDictValues(language):
     for meaning in language.formMeaningDict:
-        language.formMeaningDict[meaning] = [(i.replace("/", "").strip(), 1 / len(language.formMeaningDict[meaning]), 0+1e-20, language) for i in language.formMeaningDict[meaning]]
+        language.formMeaningDict[meaning] = [(i.replace("/", "").strip(), 1 / len(language.formMeaningDict[meaning]), 0 + 1e-20, language) for i in language.formMeaningDict[meaning]]
 
 
 def build_model(individual, weight, networkSpecifier, languageList, communityList):
@@ -853,15 +853,261 @@ def build_model(individual, weight, networkSpecifier, languageList, communityLis
 
         # limit the considered meanings to a single form.
         [i.formMeaningDict.clear() for i in inputLanguageList]
-        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", 50, 0+1e-20, languageList[17]), ("walert", 50, 0+1e-20, languageList[17])]
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", 50, 0 + 1e-20, languageList[17]), ("walert", 50, 0 + 1e-20, languageList[17])]
 
-        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", 50, 0+1e-20, languageList[18]), ("garibal", 50, 0+1e-20, languageList[18])]
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", 50, 0 + 1e-20, languageList[18]), ("garibal", 50, 0 + 1e-20, languageList[18])]
 
     elif(networkSpecifier == 2):
-        # network 3 nodes
-        pass
+        # network 2 nodes, all forms doppels
+
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/graph-bb-ww.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[17:19]
+        inputCommunityList = communityList[17:19]
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 3 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 3 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 3 * 100), 0 + 1e-20, languageList[17])]
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 3 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 3 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 3 * 100), 0 + 1e-20, languageList[18])]
+
     elif(networkSpecifier == 3):
         # network, 5 nodes
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/graph-bb-ww-yb.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[17:19]
+        inputLanguageList.append(languageList[9])
+        inputCommunityList = communityList[17:19]
+        inputCommunityList.append(communityList[9])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 3 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 3 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 3 * 100), 0 + 1e-20, languageList[17])]
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 3 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 3 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 3 * 100), 0 + 1e-20, languageList[18])]
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 3 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 3 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 3 * 100), 0 + 1e-20, languageList[9])]
+
+    elif(networkSpecifier == 4):
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/graph-5.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[16:19]
+        inputLanguageList.extend(languageList[9:11])
+        inputCommunityList = communityList[16:19]
+        inputCommunityList.extend(communityList[9:11])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[18])]
+
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[9])]
+
+        inputLanguageList[3].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[10])]
+
+        inputLanguageList[4].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[16])]
+
+    elif(networkSpecifier == "10a"):
+        # this is 10a. weight should be 0
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/graph-bb-ww.graphml", node_type=type(""))
+
+        inputLanguageList = languageList[17:19]
+        inputCommunityList = communityList[17:19]
+
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", 55, 0 + 1e-20, languageList[17]), ("walert", 45, 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", 50, 0 + 1e-20, languageList[18]), ("garibal", 50, 0 + 1e-20, languageList[18])]
+
+    elif(networkSpecifier == "10b"):
+        # thes is 10b. Weight must be 1
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/10b.graphml", node_type=type(""))
+
+        inputLanguageList = languageList[17:19]
+        inputCommunityList = communityList[17:19]
+
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", 55, 0 + 1e-20, languageList[17]), ("walert", 45, 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", 50, 0 + 1e-20, languageList[18]), ("garibal", 50, 0 + 1e-20, languageList[18])]
+
+    elif(networkSpecifier == "10c"):
+        # this is 10c, IFF the weight is 0.5. otherwise it's just the normal 2 node network structure.
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/graph-bb-ww.graphml", node_type=type(""))
+
+        inputLanguageList = languageList[17:19]
+        inputCommunityList = communityList[17:19]
+
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", 55, 0 + 1e-20, languageList[17]), ("walert", 45, 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", 50, 0 + 1e-20, languageList[18]), ("garibal", 50, 0 + 1e-20, languageList[18])]
+
+    elif(networkSpecifier == 5):
+        # network structure: undirected 5 node star
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/stargraph.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[16:19]
+        inputLanguageList.extend(languageList[9:11])
+        inputCommunityList = communityList[16:19]
+        inputCommunityList.extend(communityList[9:11])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[18])]
+
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[9])]
+
+        inputLanguageList[3].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[10])]
+
+        inputLanguageList[4].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[16])]
+
+    elif(networkSpecifier == 6):
+        # undirected 5 node path
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/pathgraph.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[16:19]
+        inputLanguageList.extend(languageList[9:11])
+        inputCommunityList = communityList[16:19]
+        inputCommunityList.extend(communityList[9:11])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[18])]
+
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[9])]
+
+        inputLanguageList[3].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[10])]
+
+        inputLanguageList[4].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[16])]
+
+    elif(networkSpecifier == 7):
+        # undirected 5 node closed/circle graph
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/closedgraph.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[16:19]
+        inputLanguageList.extend(languageList[9:11])
+        inputCommunityList = communityList[16:19]
+        inputCommunityList.extend(communityList[9:11])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[18])]
+
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[9])]
+
+        inputLanguageList[3].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[10])]
+
+        inputLanguageList[4].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[16])]
+
+    elif(networkSpecifier == 8):
+        # directed 5 node star in graph
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/directedstaringraph.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[16:19]
+        inputLanguageList.extend(languageList[9:11])
+        inputCommunityList = communityList[16:19]
+        inputCommunityList.extend(communityList[9:11])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[18])]
+
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[9])]
+
+        inputLanguageList[3].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[10])]
+
+        inputLanguageList[4].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[16])]
+
+    elif(networkSpecifier == 9):
+        # diredted 5 node star out graph
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/directedstaroutgraph.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[16:19]
+        inputLanguageList.extend(languageList[9:11])
+        inputCommunityList = communityList[16:19]
+        inputCommunityList.extend(communityList[9:11])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[18])]
+
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[9])]
+
+        inputLanguageList[3].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[10])]
+
+        inputLanguageList[4].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[16])]
+
+    elif(networkSpecifier == 10):
+        # directed 5 node path graph
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/directedpathgraph.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[16:19]
+        inputLanguageList.extend(languageList[9:11])
+        inputCommunityList = communityList[16:19]
+        inputCommunityList.extend(communityList[9:11])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[18])]
+
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[9])]
+
+        inputLanguageList[3].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[10])]
+
+        inputLanguageList[4].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[16])]
+
+    elif(networkSpecifier == 11):
+        # directed 5 node closed graph.
+        socialNet = nx.readwrite.graphml.read_graphml("./inputs/directedclosedgraph.graphml", node_type=type(""))
+        # 2 languages, 1 meaning
+        # limit the list of languages and communities to only those in focus.
+        inputLanguageList = languageList[16:19]
+        inputLanguageList.extend(languageList[9:11])
+        inputCommunityList = communityList[16:19]
+        inputCommunityList.extend(communityList[9:11])
+
+        # limit the considered meanings to a single form.
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+
+        inputLanguageList[0].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[17]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[17])]
+
+        inputLanguageList[1].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[18]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[18])]
+
+        inputLanguageList[2].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[9]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[9])]
+
+        inputLanguageList[3].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[10]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[10])]
+
+        inputLanguageList[4].formMeaningDict["possum"] = [("kuramu", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("garibal", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("walert", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("gungara", (1 / 5 * 100), 0 + 1e-20, languageList[16]), ("wadjan", (1 / 5 * 100), 0 + 1e-20, languageList[16])]
+
+    elif(networkSpecifier == 12):
+        #
         pass
 
     # relabel nodes
@@ -917,6 +1163,3 @@ def build_model(individual, weight, networkSpecifier, languageList, communityLis
 # plt.xlabel("step")
 # plt.legend()
 # plt.show()
-
-
-
