@@ -845,6 +845,14 @@ def build_model(individual, weight, networkSpecifier, languageList, communityLis
         inputLanguageList = languageList
         inputCommunityList = communityList
 
+        [i.formMeaningDict.clear() for i in inputLanguageList]
+        ufindex = 0
+        uniqueFormsList = ["balgai&", "kumaru", "*bidhawal", "*thangguai", "*muk-thang", "djawa&", "nulit", "barra", "wadjan", "*yorta", "gorrak&", "walert", "wongkuri&", "walert", "walert", "*djab", "*djadja", "*wemba", "*baraba", "*nari", "*madhi", "wogwoi", "weelt", "*yari", "purlt", "*ladji", "paltya", "*wotjo", "*jard", "pongo", "puyuk&", "kuramu", "*ngar", "milluri&"]
+        for i in range(len(inputLanguageList)):
+            inputLanguageList[i].formMeaningDict["possum"] = [("wili", 66.6, 0 + 1e-20, languageList[i])]
+            inputLanguageList[i].formMeaningDict["possum"].append((uniqueFormsList[ufindex], 33.3, 0 + 1e-20, languageList[i]))
+            ufindex += 1
+
     elif(networkSpecifier == 1):
         # network 2-nodes
         socialNet = nx.readwrite.graphml.read_graphml("./inputs/graph-bb-ww.graphml", node_type=type(""))
