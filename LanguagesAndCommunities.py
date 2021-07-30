@@ -9,10 +9,10 @@ listOfDicts = [kulinDict, yuinDict, lowMurrayDict, vicDict]
 
 
 def defineLists():
-    KulinLanguages = ["Woiwurrung", "Boonwurrung", "Daungwurrung", "Wathawurrung", "Djabwurrung", "Djadjawurrung", "Wemba Wemba", "Baraba Baraba", "Nari Nari", "Madhi Madhi", "Wadi-wadi", "Yari Yari", "Ladji-Ladji", "Wotjobaluk", "Jardwadjali", "Kolakngat", "Warrnambool", "Buwandik", "Djadjala", "Werkaya", "Tjapwurrung"]
+    KulinLanguages = ["Woiwurrung", "Boonwurrung", "Daungwurrung", "Wathawurrung", "Djabwurrung", "Djadjawurrung", "Wemba Wemba", "Baraba Baraba", "Nari Nari", "Madhi Madhi", "Wadi Wadi", "Yari Yari", "Ladji Ladji", "Wotjobaluk", "Jardwadjali", "Kolakngat", "Warrnambool", "Buwandik", "Djadjala", "Werkaya", "Tjapwurrung"]
     YuinLanguages = ["Thawa", "Ngarigu", "Gundungurra", "Moneroo"]
-    LowerMurrayLanguages = ["Ngarrindjeri", "Ngarkat", "Ngintait", "Keramin", "Yitha-Yitha"]
-    VictorianOtherLanguages = ["Muk-Thang", "Thangguai", "Bidhawal", "Dhudhuroa", "Nulit", "Pallanganmiddang", "Kurnai", "Yorta-Yorta", "Yabula-Yabula"]
+    LowerMurrayLanguages = ["Ngarrindjeri", "Ngarkat", "Ngintait", "Keramin", "Yitha Yitha"]
+    VictorianOtherLanguages = ["Muk-Thang", "Thangguai", "Bidhawal", "Dhudhuroa", "Nulit", "Pallanganmiddang", "Kurnai", "Yorta Yorta", "Yabula Yabula"]
     return((KulinLanguages, YuinLanguages, LowerMurrayLanguages, VictorianOtherLanguages))
 
 
@@ -122,7 +122,7 @@ def build_languageList():
     language21 = mdl.Language("Madhi Madhi")
     language22 = mdl.Language("Yitha Yitha")
     language23 = mdl.Language("Wadi Wadi")
-    language24 = mdl.Language("yari Yari")
+    language24 = mdl.Language("Yari Yari")
     language25 = mdl.Language("Keramin")
     language26 = mdl.Language("Ladji Ladji")
     language27 = mdl.Language("Ngintait")
@@ -221,4 +221,4 @@ def main(csvfile, listOfLanguages):
 
 
 KulinLanguages, YuinLanguages, LowerMurrayLanguages, VictorianOtherLanguages = defineLists()
-main("Vicdata_minimal_.csv", [KulinLanguages, YuinLanguages, LowerMurrayLanguages, VictorianOtherLanguages])
+main("Vicdata_minimal_possum.csv", [KulinLanguages, YuinLanguages, LowerMurrayLanguages, VictorianOtherLanguages])
