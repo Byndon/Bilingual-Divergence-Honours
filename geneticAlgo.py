@@ -60,7 +60,7 @@ def run_model(model, steps, lossLimit):
         # write out csv files for each langauge.
         with open(filename, 'a+') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(("Chromosome", i[2].speakers[0].mode, i[2].speakers[0].monitoring, "Network Weights", [i for i in dict(nx.get_edge_attributes(model.network, "weight")).values()][0]))
+            writer.writerow(("Chromosome", i[2].speakers[0].mode, i[2].speakers[0].monitoring, "Network Weights", nx.get_edge_attributes(model.network, "weight").values()))
             i[1].to_csv(csvfile, mode="a")
 
     # print([type(i[1]) for i in listOfTables])
@@ -192,6 +192,7 @@ def run_sim(listOfIndividuals, weight, steps, lossLimit, networkSpecifier, fitne
 
         fitness = fitness_function(individual, weight, steps, lossLimit, networkSpecifier, languageList, communityList, fitnessComparisonList)
         fitList.append((individual, fitness))
+        print("Simulation Done! Mode: {}, Monitoring: {}, Weight: {}".format(individual[0], individual[1], weight))
 
         # languageList = None
         # communityList = Non
@@ -259,13 +260,23 @@ previousPopulation = [[round(random.uniform(0, 1), 2) for i in range(2)],
 customPopulation = [[0.54, 1.00], [0.01, 0.99], [0.99, 0.01], [0.01, 0.01], [0.99, 0.99], [0.5, 0.5], [0.25, 0.75], [0.75, 0.25], [0.33, 0.66], [0.66, 0.33]]
 
 effectOfMonitoring = [[0.54, 0.0], [0.54, 0.1], [0.54, 0.2], [0.54, 0.3], [0.54, 0.4], [0.54, 0.5], [0.54, 0.6], [0.54, 0.7], [0.54, 0.8], [0.54, 0.9], [0.54, 1.0]]
+effectOfMode = [[0.0, 1.0], [0.1, 1.0], [0.2, 1.0], [0.3, 1.0], [0.4, 1.0], [0.5, 1.0], [0.6, 1.0], [0.7, 1.0], [0.8, 1.0], [0.9, 1.0], [1.0, 1.0]]
+test = [[0.9, 0.99999], [0.91, 0.99999], [0.92, 0.99999], [0.93, 0.99999], [0.94, 0.99999], [0.95, 0.99999], [0.96, 0.99999], [0.97, 0.99999], [0.98, 0.99999], [0.99, 0.99999], [0.99999, 0.99999]]
+internalSquare = [[0.25, 0.25], [0.25, 0.75], [0.75, 0.25], [0.75, 0.75]]
 
 fullGraph = [[0.54, 1.0], [0.54, 0.0], [0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]
-
-for i in [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 1.0]:
-    main(fullGraph, 1, i, 35, 1.0, 0, [0.5])
-    print("¬¬")
+slides = [[0.54, 1.0]]
+weightDictList = [{('19', '18'): 0.5, ('18', '19'): 1.0}]
+# index = 6
+for i in weightDictList:  # [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 1.0]:
+    main(slides, 1, i, 35, 1.0, "10b", [0.5])
+    # print("Completed Network Weight = {} ({} simulations of 66)".format(i, index))
+    # index += 6
     # customPopulation = [[0.54, 1.00], [0.01, 0.99], [0.99, 0.01], [0.01, 0.01], [0.99, 0.99], [0.5, 0.5], [0.25, 0.75], [0.75, 0.25], [0.33, 0.66], [0.66, 0.33]]
     # effectOfMonitoring = [[0.54, 0.0], [0.54, 0.1], [0.54, 0.2], [0.54, 0.3], [0.54, 0.4], [0.54, 0.5], [0.54, 0.6], [0.54, 0.7], [0.54, 0.8], [0.54, 0.9], [0.54, 1.0]]
-    fullGraph = [[0.54, 1.0], [0.54, 0.0], [0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]
+    # effectOfMode = [[0.0, 1.0], [0.1, 1.0], [0.2, 1.0], [0.3, 1.0], [0.4, 1.0], [0.5, 1.0], [0.6, 1.0], [0.7, 1.0], [0.8, 1.0], [0.9, 1.0], [1.0, 1.0]]
+    # test = [[0.9, 0.99999], [0.91, 0.99999], [0.92, 0.99999], [0.93, 0.99999], [0.94, 0.99999], [0.95, 0.99999], [0.96, 0.99999], [0.97, 0.99999], [0.98, 0.99999], [0.99, 0.99999], [0.99999, 0.99999]]
+    # internalSquare = [[0.25, 0.25], [0.25, 0.75], [0.75, 0.25], [0.75, 0.75]]
+    # fullGraph = [[0.54, 1.0], [0.54, 0.0], [0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]
+    slides = [[0.54, 1.0]]
 # main([[0.54, 0.84]], 1, 0.5, 35, 1.0, "10b", [0.5])
